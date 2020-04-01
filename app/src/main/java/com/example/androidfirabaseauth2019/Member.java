@@ -7,6 +7,7 @@ public class Member {
     private Integer Age, likeCounter;
     private List<String> friendList, categoryList;
     private Integer DickSize;
+    private Integer BoobSize;
 
     public Member(String name, String email, String userId) {
         Name = name;
