@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AndroidFirabaseAuth2019</string>
+    <string name="facebook_application_id" translatable="false">214767569627935</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb214767569627935</string>
+    <string name="signout">SignOut</string>
+    <string name="todo">TODO</string>
+    <string name="textview">TextView</string>
+
+</resources>

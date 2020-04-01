@@ -1,0 +1,2 @@
+rootProject.name='AndroidFirabaseAuth2019'
+include ':app'
