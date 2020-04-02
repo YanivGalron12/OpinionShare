@@ -1,9 +1,7 @@
 <resources>
-    <string name="app_name">AndroidFirabaseAuth2019</string>
-    <string name="facebook_application_id" translatable="false">214767569627935</string>
-    <string name="fb_login_protocol_scheme" translatable="false">fb214767569627935</string>
-    <string name="signout">SignOut</string>
-    <string name="todo">TODO</string>
-    <string name="textview">TextView</string>
+    <string name="or">------------------------OR------------------------</string>
+    <string name="AppName">𝓞𝓹𝓲𝓷𝓲𝓸𝓷𝓢𝓱𝓪𝓻𝓮</string>
+    <string name="facebook_app_id">202893697669946</string>
+    <string name="fb_login_protocol_scheme">fb202893697669946</string>
 
 </resources>
