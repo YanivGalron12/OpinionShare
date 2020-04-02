@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         //Init provider
         providers = Arrays.asList(
                 new AuthUI.IdpConfig.GoogleBuilder().build(), // Google Builder
@@ -72,8 +73,10 @@ public class MainActivity extends AppCompatActivity {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             if (resultCode == RESULT_OK){
                 //Get User
+
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 Toast.makeText(this,""+user.getEmail(),Toast.LENGTH_SHORT).show();
+                finish();
                 Intent goToLogin = new Intent(MainActivity.this, ProfileActivity.class);
 
                 startActivity(goToLogin);
