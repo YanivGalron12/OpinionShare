@@ -52,6 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
     EditText savetext;
     ProgressBar prograssbar;
     ImageView profileImage;
+    String goog = "ggoogg";
 
 
     // add Firebase Database stuff
