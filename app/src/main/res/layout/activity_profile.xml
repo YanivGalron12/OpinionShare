@@ -6,33 +6,93 @@
     android:layout_height="match_parent"
     tools:context=".ProfileActivity">
 
+    <LinearLayout
+        android:id="@+id/userinformation_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_bg">
+
+        <TextView
+            android:id="@+id/username_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="150dp"
+            android:hint="Username"
+            android:textAlignment="center"
+            tools:ignore="HardcodedText" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/profileImage"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_below="@+id/userinformation_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="-60dp"
+        android:background="@drawable/user_profile_image_background"
+        android:elevation="4dp"
+        android:src="@drawable/ic_boy" />
+
+    <EditText
+        android:id="@+id/savetext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/profileImage"
+        android:layout_marginTop="20dp"
+        android:hint="this is your bio"
+        android:textAlignment="center"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/clicktosave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/savetext"
+        android:layout_centerHorizontal="true"
+        android:text="Save"
+        android:textAllCaps="false"
+        tools:ignore="HardcodedText" />
+
+    <ProgressBar
+        android:id="@+id/prograssbar"
+        style="@android:style/Widget.Holo.ProgressBar.Large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/clicktosave"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/showtext_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/prograssbar"
+        android:text="Show Text"
+        android:textAllCaps="false"
+        tools:ignore="HardcodedText" />
 
     <TextView
-        android:id="@+id/lastname"
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/prograssbar"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="11dp"
+        android:layout_marginEnd="185dp"
+        android:hint="asdsdd"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/signout_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="535dp"
-        android:hint="lastname"
-        android:textAlignment="center" />
-
-    <TextView
-        android:id="@+id/firstname"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="33dp"
-        android:hint="firstname"
-        android:textAlignment="center" />
-
-    <TextView
-        android:id="@+id/email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="33dp"
-        android:hint="email"
-        android:textAlignment="center" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:text="Sign Out"
+        android:textAllCaps="false"
+        tools:ignore="HardcodedText" />
 
 
 </RelativeLayout>

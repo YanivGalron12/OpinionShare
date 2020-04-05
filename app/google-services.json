@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "509640917107",
+    "firebase_url": "https://opinionshare-1585847822926.firebaseio.com",
+    "project_id": "opinionshare-1585847822926",
+    "storage_bucket": "opinionshare-1585847822926.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:509640917107:android:a3c5a65184f2e2ff962a06",
+        "android_client_info": {
+          "package_name": "com.example.opinionshare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "509640917107-v2i40det3he0ueeps2h4buv6efdg14mk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.opinionshare",
+            "certificate_hash": "14537ecaf72e510e6955edcce669ecc731f9f63b"
+          }
+        },
+        {
+          "client_id": "509640917107-64ebm26l1l73ome6200sldi5dq7idb3g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCOAtBiSBfu2pzWHq_R2uNTkYAaiUvPU4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "509640917107-64ebm26l1l73ome6200sldi5dq7idb3g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
