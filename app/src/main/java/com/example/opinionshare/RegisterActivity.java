@@ -43,8 +43,11 @@ public class RegisterActivity extends AppCompatActivity {
     String memberName;
     Member member;
 
+
+
     // Activity UI
     EditText edit_text_email, edit_text_password, edit_text_fullname, edit_text_username;
+    Button continue_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,7 @@ public class RegisterActivity extends AppCompatActivity {
         edit_text_password = findViewById(R.id.edit_text_password);
         edit_text_fullname = findViewById(R.id.edit_text_fullname);
         edit_text_username = findViewById(R.id.edit_text_username);
+        continue_btn = findViewById(R.id.continue_btn);
 
 
 
@@ -89,10 +93,14 @@ public class RegisterActivity extends AppCompatActivity {
             // This is an existing user get Member information from ds
             member = new Member(); // I Thinks we need to declare empty Member in order for the
                                    // addValueEventListener to be able to retrieve data to it
-
-
-
         }
+        continue_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(RegisterActivity.this,"Your details have been updated",Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(RegisterActivity.this, ProfileActivity.class));
+            }
+        });
 
     }
 

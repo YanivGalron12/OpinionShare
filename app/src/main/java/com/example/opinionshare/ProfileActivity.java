@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Telephony;
 import android.text.Editable;
@@ -41,8 +43,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.util.UUID;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -50,8 +55,9 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = "AddToDatabase";
     private FirebaseAuth mAuth;
     // UI Objects
-    TextView text, username_text, email, firstname, lastname;
+    TextView text, username_textview;
     Button signout_btn, info_btn;
+    CircleImageView profileImage;
 
     // add Firebase Database stuff
     FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -82,10 +88,11 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        username_text = findViewById(R.id.username_text);
         signout_btn = findViewById(R.id.signout_btn);
         info_btn= findViewById(R.id.info_btn);
         text = findViewById(R.id.text);
+        profileImage = findViewById(R.id.profileImage);
+        username_textview = findViewById(R.id.username_textview);
 
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -124,15 +131,12 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         user = auth.getCurrentUser();
-        assert user != null;
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mRef = mFirebaseDatabase.getReference();
         memberId = user.getUid();
 
         String userDisplayName = user.getDisplayName();
         Uri photoUri =  user.getPhotoUrl();
-//        Toast.makeText(this, user.getEmail(), Toast.LENGTH_SHORT).show();
-        username_text.setText(userDisplayName);
 
 
         signout_btn.setOnClickListener(new View.OnClickListener() {
@@ -148,6 +152,8 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
         member = new Member();
+
+
 
     }
 
@@ -165,6 +171,12 @@ public class ProfileActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
                     member = dataSnapshot.child("users").child(memberId).getValue(Member.class);
+                    username_textview.setText(member.getName());
+                    if(!member.getProfilePhotoUri().equals("NoPhoto")){
+                        Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
+                    }else{
+                        Picasso.get().load("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcThwba7bWlXMP_8RyrorKR_NqUpHKlZMBcAJNxzdOMiOC7d5csj&usqp=CAU").into(profileImage);
+                    }
                 } else {
                     // TODO: change else actions
                     Toast.makeText(ProfileActivity.this, "data does not exist", Toast.LENGTH_LONG).show();
@@ -190,6 +202,4 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 });
     }
-
-
 }
