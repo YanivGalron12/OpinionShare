@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+
 public class Member {
     private String name;
     private String email;
@@ -22,6 +23,9 @@ public class Member {
     private List<String> friendList, categoryList;
 
 
+    public Member() {
+        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+    }
     public Member(String userId, String name, String email, String profilePhotoUri, String phoneNumber) {
         this.name = name;
         this.email = email;

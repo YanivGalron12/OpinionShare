@@ -7,28 +7,59 @@
     android:scrollbarAlwaysDrawVerticalTrack="true"
     tools:context=".RegisterActivity">
 
-    <TextView
-        android:id="@+id/AppName"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginTop="20dp"
-        android:text="@string/AppName"
-        android:textAlignment="center"
-        android:textSize="60sp" />
-
+    <!--   <TextView
+           android:id="@+id/AppName"
+           android:layout_width="match_parent"
+           android:layout_height="80dp"
+           android:layout_marginTop="20dp"
+           android:text="@string/AppName"
+           android:textAlignment="center"
+           android:textSize="60sp" />
+   -->
     <RelativeLayout
         android:id="@+id/signupLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/AppName">
+        android:layout_width="399dp"
+        android:layout_height="627dp">
+        <!--android:layout_below="@id/AppName"-->
+
+        <Button
+            android:id="@+id/signup_btn"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+
+            android:layout_below="@+id/signupLayout"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="-103dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginBottom="5dp"
+            android:background="@color/uniqueRed"
+            android:text="Continue"
+            android:textAllCaps="false"
+            android:textColor="#fff"
+            android:textSize="22sp"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:text="We Want to get to know you better! :)"
+            android:textAlignment="center"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
 
         <RelativeLayout
             android:id="@id/signupLayout"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
+            android:layout_width="373dp"
+            android:layout_height="413dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="60dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="113dp"
             android:background="#fff"
             android:elevation="4dp"
             android:orientation="vertical"
@@ -37,43 +68,20 @@
             android:paddingRight="30dp"
             android:paddingBottom="20dp">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/details_layout"
+                android:layout_marginTop="10dp"
+                android:textSize="20sp"
+                android:text="Please fill and change you details:"
+                android:textStyle="italic" />
+
             <LinearLayout
+                android:id="@+id/details_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="10dp">
-
-
-                <Button
-                    android:id="@+id/facebook_sign_in"
-                    android:layout_width="fill_parent"
-                    android:layout_height="30dp"
-                    android:layout_margin="5dp"
-                    android:background="#E33C17"
-                    android:text="Log in with facebook"
-                    android:textAllCaps="false"
-                    android:textColor="#fff"
-                    android:textSize="18sp" />
-
-                <Button
-                    android:id="@+id/google_sign_in"
-                    android:layout_width="fill_parent"
-                    android:layout_height="30dp"
-                    android:layout_margin="5dp"
-                    android:background="#E33C17"
-                    android:text="Log in with Google"
-                    android:textAllCaps="false"
-                    android:textColor="#fff"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/or1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="@string/or"
-                    android:textAlignment="center"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:orientation="vertical">
 
 
                 <EditText
@@ -120,71 +128,20 @@
                     android:singleLine="true"
                     tools:ignore="HardcodedText" />
 
-                <Button
-                    android:id="@+id/signup_btn"
-                    android:layout_width="fill_parent"
-                    android:layout_height="30dp"
-                    android:layout_margin="5dp"
-                    android:background="#E33C17"
-                    android:text="Sign up"
-                    android:textAllCaps="false"
-                    android:textColor="#fff"
-                    android:textSize="18sp"
-                    tools:ignore="HardcodedText" />
-
-
             </LinearLayout>
         </RelativeLayout>
 
-        <ImageButton
-            android:id="@+id/user_profile_photo"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/user_profile_image_background"
-            android:elevation="4dp"
-            android:src="@drawable/opinionshare_icon" />
+        <!-- <ImageButton
+             android:id="@+id/user_profile_photo"
+             android:layout_width="100dp"
+             android:layout_height="100dp"
+             android:layout_centerHorizontal="true"
+             android:layout_marginBottom="5dp"
+             android:background="@drawable/user_profile_image_background"
+             android:elevation="4dp"
+             android:src="@drawable/opinionshare_icon" /> -->
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/loginLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/signupLayout"
-        android:layout_marginTop="10dp">
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:background="#fff"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/login"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="10dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:text="have an account? Log in"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                android:textColor="#d67601"
-                android:textSize="18sp" />
-
-        </RelativeLayout>
-    </RelativeLayout>
-
-    <ProgressBar
-        android:id="@+id/progressbar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
 
 </RelativeLayout>

@@ -29,6 +29,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.Arrays;
@@ -38,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
 
     // Choose an arbitrary request code value
     private static final int MY_REQUEST_CODE = 3423;
+    private static final String TAG = "TAG";
+    // add Firebase Database stuff
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mRef;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseUserMetadata metadata;
     List<AuthUI.IdpConfig> providers;
@@ -48,9 +57,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mRef = mFirebaseDatabase.getReference();
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
             // user is already signed in
+            // TODO: get Member Object from RTDB
+            // Read from the database
+            Member member;
+            getMemberfromRTDB(mRef, user.getUid());
+
             startActivity(new Intent(MainActivity.this, ProfileActivity.class));
             finish();
             return; // need return because we don't need to execute showSignInOption and set providers
@@ -58,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
 
         providers = Arrays.asList(
                 new AuthUI.IdpConfig.GoogleBuilder().build(), // Google Builder
-                new AuthUI.IdpConfig.FacebookBuilder().build() //Facebook Builder
+                new AuthUI.IdpConfig.FacebookBuilder().build(), //Facebook Builder
+                new AuthUI.IdpConfig.PhoneBuilder().build(), // Phone Builder
+                new AuthUI.IdpConfig.EmailBuilder().build() // Email Builder
                 // TODO: fix Facebook provider authentication - follow the guide at
                 // TODO: https://developers.facebook.com/apps/202893697669946/fb-login/quickstart/ At 2.6
                 // TODO: add email/phone authentication
@@ -98,26 +116,31 @@ public class MainActivity extends AppCompatActivity {
                 if (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp()) {
                     // The user is new, show them a fancy intro screen!
                     // TODO: pass to the next intent that this is a new user or check there if the user is new
-                    Toast.makeText(this,"Welcome to OpinionShare !!!!",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Welcome to OpinionShare !!!!", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(MainActivity.this, RegisterActivity.class));
                     finish();
                 } else {
                     // This is an existing user.
+                    // Read from the database
+                    Member member;
+                    getMemberfromRTDB(mRef, user.getUid());
+                    // TODO: Get Member Object from RTDB
                     // TODO: show welcome back screen?
-                    Toast.makeText(this,"Welcome back my old friend",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Welcome back my old friend", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(MainActivity.this, ProfileActivity.class));
                     finish();
                 }
             } else {
                 // Sign in failed
-                Toast.makeText(this, "Failed to sign in", Toast.LENGTH_LONG).show();
                 // TODO: check what is it Snackbar - (Flutter?)
                 if (response == null) {
                     // User pressed back button
+                    finish();
                     //showSnackbar(R.string.sign_in_cancelled);
                     return;
                 }
                 if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
+                    Toast.makeText(this, "Failed to sign in", Toast.LENGTH_LONG).show();
                     //showSnackbar(R.string.no_internet_connection);
                     return;
                 }
@@ -127,5 +150,27 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
+    }
+
+    public void getMemberfromRTDB(DatabaseReference mRef, String memberID) {
+        // Read from the database
+        mRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this Location is updated
+                Log.d(TAG, "onDataChange: Added information to database: \n" +
+                        dataSnapshot.getValue());
+                Member member = dataSnapshot.child("users").child(memberID).getValue(Member.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", databaseError.toException());
+            }
+        });
+
+
     }
 }

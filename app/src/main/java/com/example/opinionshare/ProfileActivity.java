@@ -6,8 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.text.Editable;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +28,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
@@ -48,17 +51,18 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     // UI Objects
     TextView text, username_text, email, firstname, lastname;
-    Button signout_btn, clicktosave;
-    EditText savetext;
-    ProgressBar prograssbar;
-    ImageView profileImage;
-    String goog = "ggoogg";
-
+    Button signout_btn, info_btn;
 
     // add Firebase Database stuff
     FirebaseAuth auth = FirebaseAuth.getInstance();
-    FirebaseUser user;
     FirebaseUserMetadata metadata;
+    FirebaseUser user;
+
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mRef;
+    String memberId;
+    Member member;
+
 
 
 //    // TODO: put this onBackPressed function on the main activity of the app
@@ -78,15 +82,52 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-
         username_text = findViewById(R.id.username_text);
         signout_btn = findViewById(R.id.signout_btn);
+        info_btn= findViewById(R.id.info_btn);
         text = findViewById(R.id.text);
-        clicktosave = findViewById(R.id.clicktosave);
-        savetext = findViewById(R.id.savetext);
-        prograssbar = findViewById(R.id.prograssbar);
+
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        // Set Profile Selected
+        bottomNavigationView.setSelectedItemId(R.id.profile);
+        // Perform ItemSelectedListener
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.home:
+                        startActivity(new Intent(getApplicationContext(),HomeActivity.class));
+                        finish();
+                        overridePendingTransition(0,0);
+                        return true;
+                    case R.id.explore:
+                        startActivity(new Intent(getApplicationContext(),ExploreActivity.class));
+                        finish();
+                        overridePendingTransition(0,0);
+                        return true;
+                    case R.id.inbox:
+                        startActivity(new Intent(getApplicationContext(), InboxActivity.class));
+                        finish();
+                        overridePendingTransition(0,0);
+                        return true;
+                    case R.id.shop:
+                        startActivity(new Intent(getApplicationContext(), ShopActivity.class));
+                        finish();
+                        overridePendingTransition(0,0);
+                        return true;
+                    case R.id.profile:
+                        return true;
+                }
+                return false;
+            }
+        });
 
         user = auth.getCurrentUser();
+        assert user != null;
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mRef = mFirebaseDatabase.getReference();
+        memberId = user.getUid();
 
         String userDisplayName = user.getDisplayName();
         Uri photoUri =  user.getPhotoUrl();
@@ -100,10 +141,43 @@ public class ProfileActivity extends AppCompatActivity {
                 signOut();
             }
         });
-
+        info_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ProfileActivity.this, RegisterActivity.class));
+            }
+        });
+        member = new Member();
 
     }
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Read from the database
+        mRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this Location is updated
+                Log.d(TAG, "onDataChange: Added information to database: \n" +
+                        dataSnapshot.getValue());
+                if (dataSnapshot.exists()) {
+                    member = dataSnapshot.child("users").child(memberId).getValue(Member.class);
+                } else {
+                    // TODO: change else actions
+                    Toast.makeText(ProfileActivity.this, "data does not exist", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", databaseError.toException());
+            }
+        });
+    }
     private void signOut() {
         AuthUI.getInstance()
                 .signOut(this)
