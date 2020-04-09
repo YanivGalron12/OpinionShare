@@ -70,9 +70,9 @@ public class ProfileActivity extends AppCompatActivity {
     FirebaseUser user;
 
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mRef;
+    private DatabaseReference usersRef;
     String memberId;
-    Member member;
+    Member member = new Member();
 
 
 
@@ -137,7 +137,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         user = auth.getCurrentUser();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mRef = mFirebaseDatabase.getReference();
+        usersRef = mFirebaseDatabase.getReference().child("users");
         memberId = user.getUid();
 
         String userDisplayName = user.getDisplayName();
@@ -167,7 +167,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // Read from the database
-        mRef.addValueEventListener(new ValueEventListener() {
+        usersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -175,8 +175,8 @@ public class ProfileActivity extends AppCompatActivity {
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
-                    member = dataSnapshot.child("users").child(memberId).getValue(Member.class);
-                    username_textview.setText(member.getName());
+                    member = dataSnapshot.child(memberId).getValue(Member.class);
+                    username_textview.setText(member.getUsername());
                     if(!member.getProfilePhotoUri().equals("NoPhoto")){
                         Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
                     }else{

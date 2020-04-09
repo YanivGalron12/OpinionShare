@@ -21,6 +21,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.GenericTypeIndicator;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
@@ -34,6 +35,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,7 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
     FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseUserMetadata metadata;
-
+    Date date = new Date();
     private DocumentReference mDocRef;
 
     // member details
@@ -58,9 +60,10 @@ public class RegisterActivity extends AppCompatActivity {
     String memberPhoneNumber;
     String memberUserName;
     String memberEmail;
+    String newUserName;
     String memberName;
     String memberId;
-    Member member;
+    Member member = new Member();
 
 
     // Activity UI
@@ -94,7 +97,11 @@ public class RegisterActivity extends AppCompatActivity {
 
         memberId = user.getUid();
         Toast.makeText(getApplicationContext(),"memberId:"+memberId,Toast.LENGTH_LONG).show();
-        if (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp()) {
+        /**need to add the <10000 msec because otherwise the app will think this is a new user
+         * even if the user is already been in the RegisterActivity
+         * (if he didn't logged out since)
+        **/
+         if ((date.getTime() - metadata.getLastSignInTimestamp()<10000) && (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp())) {
             // The user is new. Save all the user's data you can get
             // Object.requireNoNull was added by android studio suggestions
             memberEmail = user.getEmail();
@@ -113,24 +120,26 @@ public class RegisterActivity extends AppCompatActivity {
             // Display user details
             edit_text_email.setText(memberEmail);
             edit_text_fullname.setText(memberName);
-            edit_text_username.setText(memberUserName);
             // TODO: create UI platform for adding more information about the new user
         } else {
             // This is an existing user get Member information from ds
-            member = new Member(); // I Thinks we need to declare empty Member in order for the
-            // addValueEventListener to be able to retrieve data to it
+//            member = new Member(); // I Thinks we need to declare empty Member in order for the
+//             addValueEventListener to be able to retrieve data to it
         }
         continue_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                member.setUsername(edit_text_username.getText().toString());
                 member.setEmail(edit_text_email.getText().toString());
                 member.setName(edit_text_fullname.getText().toString());
-                if (!member.getUsername().equals("")) {
-                    Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
+                newUserName = edit_text_username.getText().toString();
+                if (!newUserName.equals("")  ) {
+                    if (!newUserName.equals(memberUserName)){
+                        member.setUsername(newUserName);
+                        Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
+                        usersList.add(newUserName);
+                    }
                     startActivity(new Intent(RegisterActivity.this, ProfileActivity.class));
                     addUserToDatabase(member);
-                    usersList.add(member.getUsername());
                     usersListRef.setValue(usersList);
                 } else {
                     Toast.makeText(RegisterActivity.this, "UserName can't be empty", Toast.LENGTH_SHORT).show();
@@ -146,8 +155,6 @@ public class RegisterActivity extends AppCompatActivity {
 
             }
         });
-        member = new Member();
-
     }
 
     @Override
@@ -194,15 +201,13 @@ public class RegisterActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     member = dataSnapshot.child(memberId).getValue(Member.class);
 
-
-                    Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
-
-                    memberUserName = member.getUsername();
                     memberName = member.getName();
                     memberEmail = member.getEmail();
+                    memberUserName = member.getUsername();
                     memberPhoneNumber = member.getPhoneNumber();
                     memberProfilePhotoUri = member.getProfilePhotoUri();
                     memberUserName = member.getUsername();
+
                     if (!memberUserName.equals("")) {
                         usersList.add(memberUserName);
                     }
@@ -210,6 +215,8 @@ public class RegisterActivity extends AppCompatActivity {
                     edit_text_email.setText(memberEmail);
                     edit_text_fullname.setText(memberName);
                     edit_text_username.setText(memberUserName);
+                    Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
+
                 } else {
                     // TODO: change else actions
                     Toast.makeText(RegisterActivity.this, "data does not exist", Toast.LENGTH_LONG).show();
@@ -237,6 +244,7 @@ public class RegisterActivity extends AppCompatActivity {
                         usersList.add(tD);
                     }
                     memberUserName = member.getUsername();
+                    edit_text_username.setText(memberUserName);
                     if (!memberUserName.equals("")) {
                         usersList.add(memberUserName);
                     }
