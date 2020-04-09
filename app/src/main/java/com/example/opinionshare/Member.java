@@ -17,20 +17,22 @@ public class Member {
     private String email;
     private String userId;
     private String userType;
+    private String username;
     private String phoneNumber;
     private String profilePhotoUri;
     private Integer age, likeCounter;
     private List<String> friendList, categoryList;
 
-
     public Member() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
-    public Member(String userId, String name, String email, String profilePhotoUri, String phoneNumber) {
+
+    public Member(String userId, String name, String email, String profilePhotoUri, String phoneNumber, String username) {
         this.name = name;
         this.email = email;
         this.userId = userId;
         this.userType = "Basic";
+        this.username = username;
         this.phoneNumber = phoneNumber;
         this.profilePhotoUri = profilePhotoUri;
         this.age = 1000;
@@ -38,6 +40,14 @@ public class Member {
         this.friendList = new ArrayList<String>();
         this.categoryList = new ArrayList<String>();
 
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getName() {

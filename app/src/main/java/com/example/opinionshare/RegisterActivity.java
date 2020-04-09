@@ -32,6 +32,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -48,8 +50,10 @@ public class RegisterActivity extends AppCompatActivity {
     private DocumentReference mDocRef;
 
     // member details
+    ArrayList<String> usersList;
     String memberProfilePhotoUri;
     String memberPhoneNumber;
+    String memberUserName;
     String memberEmail;
     String memberName;
     Member member;
@@ -76,7 +80,6 @@ public class RegisterActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profileImage);
 
 
-
         FirebaseUser user = auth.getCurrentUser();
         // TODO: check what to do with comment on .getMetadata
         assert user != null; // This was added by android studio suggestions
@@ -97,12 +100,14 @@ public class RegisterActivity extends AppCompatActivity {
             } else {
                 memberProfilePhotoUri = "NoPhoto";
             }
-            member = new Member(memberId, memberName, memberEmail, memberProfilePhotoUri, memberPhoneNumber);
+            memberUserName = edit_text_username.getText().toString();
+            member = new Member(memberId, memberName, memberEmail, memberProfilePhotoUri, memberPhoneNumber, memberUserName);
             addUserToDatabase(member); // Add this member to RTDB (Real Time Database)
 
             // Display user details
             edit_text_email.setText(memberEmail);
             edit_text_fullname.setText(memberName);
+            edit_text_username.setText(memberUserName);
             // TODO: create UI platform for adding more information about the new user
         } else {
             // This is an existing user get Member information from ds
@@ -112,8 +117,18 @@ public class RegisterActivity extends AppCompatActivity {
         continue_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(RegisterActivity.this, ProfileActivity.class));
+                member.setUsername(edit_text_username.getText().toString());
+                member.setEmail(edit_text_email.getText().toString());
+                member.setName(edit_text_fullname.getText().toString());
+                if (!member.getUsername().equals("")) {
+                    Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(RegisterActivity.this, ProfileActivity.class));
+                    addUserToDatabase(member);
+                    mRef.child("usersList").setValue(usersList);
+                } else {
+                    Toast.makeText(RegisterActivity.this, "UserName can't be empty", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
         change_profile_photo_TextView.setOnClickListener(new View.OnClickListener() {
@@ -154,7 +169,6 @@ public class RegisterActivity extends AppCompatActivity {
 //                    });
 
             member.setProfilePhotoUri(selectedImage.toString());
-
             addUserToDatabase(member);
         }
     }
@@ -172,7 +186,25 @@ public class RegisterActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
                     member = dataSnapshot.child("users").child(memberId).getValue(Member.class);
+                    usersList = dataSnapshot.child("userList").getValue(ArrayList.class);
+                    usersList = usersList == null ? new ArrayList<>() : usersList;
+
+
                     Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
+
+                    memberUserName = member.getUsername();
+                    memberName = member.getName();
+                    memberEmail = member.getEmail();
+                    memberPhoneNumber = member.getPhoneNumber();
+                    memberProfilePhotoUri = member.getProfilePhotoUri();
+                    memberUserName = member.getUsername();
+                    if (!memberUserName.equals("")) {
+                        usersList.add(memberUserName);
+                    }
+
+                    edit_text_email.setText(memberEmail);
+                    edit_text_fullname.setText(memberName);
+                    edit_text_username.setText(memberUserName);
                 } else {
                     // TODO: change else actions
                     Toast.makeText(RegisterActivity.this, "data does not exist", Toast.LENGTH_LONG).show();
@@ -185,19 +217,12 @@ public class RegisterActivity extends AppCompatActivity {
                 Log.w(TAG, "Failed to read value.", databaseError.toException());
             }
         });
-        memberName = member.getName();
-        memberEmail = member.getEmail();
-        memberPhoneNumber = member.getPhoneNumber();
-        memberProfilePhotoUri = member.getProfilePhotoUri();
-
-        edit_text_email.setText(memberEmail);
-        edit_text_fullname.setText(memberName);
     }
 
     private void addUserToDatabase(Member member) {
         String memberId = member.getUserId();
         mRef.child("users").child(memberId).setValue(member);
-        Toast.makeText(this, "Your information is now saved in our system :)", Toast.LENGTH_LONG).show();
     }
+
 
 }
