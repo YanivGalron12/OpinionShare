@@ -54,9 +54,14 @@ public class ProfileActivity extends AppCompatActivity {
 
     private static final String TAG = "AddToDatabase";
     private FirebaseAuth mAuth;
+
+
     // UI Objects
-    TextView text, username_textview;
-    Button signout_btn, info_btn;
+    TextView username_textview;
+    TextView text;
+    Button signout_btn;
+    Button info_btn;
+
     CircleImageView profileImage;
 
     // add Firebase Database stuff
@@ -151,7 +156,7 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(new Intent(ProfileActivity.this, RegisterActivity.class));
             }
         });
-        member = new Member();
+
 
 
 

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#fff"
     android:orientation="vertical"
     android:scrollbarAlwaysDrawVerticalTrack="true"
-    tools:context=".RegisterActivity"
-    android:background="#fff">
+    tools:context=".RegisterActivity">
 
     <!--   <TextView
            android:id="@+id/AppName"
@@ -23,6 +24,29 @@
         android:layout_height="627dp">
         <!--android:layout_below="@id/AppName"-->
 
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profileImage"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_below="@+id/Text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/ic_home"
+            android:elevation="4dp"
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="2dp" />
+
+        <TextView
+            android:id="@+id/change_profile_photo_TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/profileImage"
+            android:layout_centerHorizontal="true"
+            android:text="Change Photo"
+            android:textColor="@color/linkColor"
+            android:textSize="15sp" />
+
         <Button
             android:id="@+id/continue_btn"
             android:layout_width="200dp"
@@ -31,8 +55,8 @@
             android:layout_below="@+id/signupLayout"
             android:layout_alignParentEnd="true"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="-103dp"
-            android:layout_marginEnd="6dp"
+            android:layout_marginTop="-54dp"
+            android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
             android:background="@color/uniqueRed"
             android:text="Continue"
@@ -42,6 +66,7 @@
             tools:ignore="HardcodedText" />
 
         <TextView
+            android:id="@+id/Text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -54,11 +79,10 @@
 
         <RelativeLayout
             android:id="@id/signupLayout"
-            android:layout_width="match_parent"
-            android:layout_height="413dp"
+            android:layout_width="367dp"
+            android:layout_height="256dp"
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="120dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="113dp"
             android:background="#fff"
@@ -73,7 +97,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="1dp"
-                android:text="Please fill and change you details:"
+                android:text="Please fill and change your details:"
                 android:textSize="20sp"
                 android:textStyle="italic" />
 

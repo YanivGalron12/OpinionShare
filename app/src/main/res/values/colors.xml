@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="uniqueRed">#FC466B</color>
+    <color name="linkColor">#0000EE</color>
 </resources>

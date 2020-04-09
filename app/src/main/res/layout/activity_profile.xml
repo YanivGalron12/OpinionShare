@@ -7,9 +7,6 @@
     tools:context=".ProfileActivity">
 
 
-
-
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="wrap_content"
@@ -25,18 +22,18 @@
         android:id="@+id/userinformation_layout"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:background="@drawable/ic_bg">
+        android:background="@drawable/ic_bg"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/username_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#f3f3f3"
-            android:gravity="center_horizontal"
             android:layout_marginTop="40dp"
+            android:gravity="center_horizontal"
+            android:textColor="#f3f3f3"
             android:textSize="50sp"
             android:textStyle="bold" />
-
 
     </LinearLayout>
 
@@ -48,6 +45,7 @@
         android:layout_below="@+id/userinformation_layout"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="-60dp"
+        android:background="@drawable/ic_home"
         android:elevation="4dp"
         app:civ_border_color="#FF000000"
         app:civ_border_width="2dp" />
