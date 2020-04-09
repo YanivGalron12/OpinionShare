@@ -31,7 +31,8 @@ public class ExploreActivity extends AppCompatActivity {
 
     private static final String TAG = "TAG";
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mRef;
+    private DatabaseReference usersRef;
+    private DatabaseReference usersListRef;
     String memberId;
     Member member;
 
@@ -40,7 +41,7 @@ public class ExploreActivity extends AppCompatActivity {
     SearchView searchView;
     ListView listView;
 
-    ArrayList<String> list;
+    ArrayList<String> list = new ArrayList<>();
     ArrayAdapter<String> adapter;
 
     @Override
@@ -49,7 +50,9 @@ public class ExploreActivity extends AppCompatActivity {
         setContentView(R.layout.activity_explore);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mRef = mFirebaseDatabase.getReference();
+        usersRef = mFirebaseDatabase.getReference().child("users");
+        usersListRef = mFirebaseDatabase.getReference().child("usersList");
+
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();
         memberId = user.getUid();
@@ -58,7 +61,7 @@ public class ExploreActivity extends AppCompatActivity {
         searchView = findViewById(R.id.searchView);
         listView = findViewById(R.id.listView);
 
-        listView.setVisibility(View.INVISIBLE);
+//        listView.setVisibility(View.INVISIBLE);
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
         listView.setAdapter(adapter);
@@ -72,8 +75,8 @@ public class ExploreActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 adapter.getFilter().filter(newText);
-                if (newText == "") {
-                    listView.setVisibility(View.INVISIBLE);
+                if (newText.equals("")) {
+//                    listView.setVisibility(View.INVISIBLE);
                 } else {
                     listView.setVisibility(View.VISIBLE);
                 }
@@ -124,7 +127,7 @@ public class ExploreActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // Read from the database
-        mRef.addValueEventListener(new ValueEventListener() {
+        usersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -133,12 +136,34 @@ public class ExploreActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
                     member = dataSnapshot.child("users").child(memberId).getValue(Member.class);
-                    list = dataSnapshot.child("userList").getValue(ArrayList.class);
-                    list = list == null ? new ArrayList<>() : list;
-
                 } else {
                     // TODO: change else actions
-                    Toast.makeText(ExploreActivity.this, "data does not exist", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ExploreActivity.this, "user data does not exist", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", databaseError.toException());
+            }
+        });
+
+        usersListRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this Location is updated
+                Log.d(TAG, "onDataChange: Added information to database: \n" +
+                        dataSnapshot.getValue());
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot d: dataSnapshot.getChildren()){
+                        String tD = d.getValue(String.class);
+                        list.add(tD);
+                    }
+                } else {
+                    // TODO: change else actions
+                    Toast.makeText(ExploreActivity.this, "user list data does not exist", Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -150,3 +175,4 @@ public class ExploreActivity extends AppCompatActivity {
         });
     }
 }
+

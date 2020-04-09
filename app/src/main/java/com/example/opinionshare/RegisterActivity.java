@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.client.Firebase;
+import com.firebase.client.GenericTypeIndicator;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,20 +43,23 @@ public class RegisterActivity extends AppCompatActivity {
     private static final String TAG = "TAG";
     // add Firebase Database stuff
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mRef;
+    private DatabaseReference usersRef;
+    private DatabaseReference usersListRef;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseUserMetadata metadata;
-    String memberId;
+
     private DocumentReference mDocRef;
 
     // member details
-    ArrayList<String> usersList;
+//    GenericTypeIndicator<List<String>> t = new GenericTypeIndicator<List<String>>() {};
+    ArrayList<String> usersList = new ArrayList<>();
     String memberProfilePhotoUri;
     String memberPhoneNumber;
     String memberUserName;
     String memberEmail;
     String memberName;
+    String memberId;
     Member member;
 
 
@@ -85,9 +89,11 @@ public class RegisterActivity extends AppCompatActivity {
         assert user != null; // This was added by android studio suggestions
         metadata = user.getMetadata();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mRef = mFirebaseDatabase.getReference();
+        usersRef = mFirebaseDatabase.getReference().child("users");
+        usersListRef = mFirebaseDatabase.getReference().child("usersList");
 
         memberId = user.getUid();
+        Toast.makeText(getApplicationContext(),"memberId:"+memberId,Toast.LENGTH_LONG).show();
         if (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp()) {
             // The user is new. Save all the user's data you can get
             // Object.requireNoNull was added by android studio suggestions
@@ -124,7 +130,8 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(RegisterActivity.this, ProfileActivity.class));
                     addUserToDatabase(member);
-                    mRef.child("usersList").setValue(usersList);
+                    usersList.add(member.getUsername());
+                    usersListRef.setValue(usersList);
                 } else {
                     Toast.makeText(RegisterActivity.this, "UserName can't be empty", Toast.LENGTH_SHORT).show();
                 }
@@ -177,7 +184,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // Read from the database
-        mRef.addValueEventListener(new ValueEventListener() {
+        usersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -185,9 +192,7 @@ public class RegisterActivity extends AppCompatActivity {
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
-                    member = dataSnapshot.child("users").child(memberId).getValue(Member.class);
-                    usersList = dataSnapshot.child("userList").getValue(ArrayList.class);
-                    usersList = usersList == null ? new ArrayList<>() : usersList;
+                    member = dataSnapshot.child(memberId).getValue(Member.class);
 
 
                     Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
@@ -217,12 +222,43 @@ public class RegisterActivity extends AppCompatActivity {
                 Log.w(TAG, "Failed to read value.", databaseError.toException());
             }
         });
+
+        usersListRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this Location is updated
+                Log.d(TAG, "onDataChange: Added information to database: \n" +
+                        dataSnapshot.getValue());
+                if (dataSnapshot.exists()) {
+
+                    for (DataSnapshot d: dataSnapshot.getChildren()){
+                        String tD = d.getValue(String.class);
+                        usersList.add(tD);
+                    }
+                    memberUserName = member.getUsername();
+                    if (!memberUserName.equals("")) {
+                        usersList.add(memberUserName);
+                    }
+                } else {
+                    // TODO: change else actions
+                    Toast.makeText(RegisterActivity.this, "users list data does not exist", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", databaseError.toException());
+            }
+        });
+
+
     }
 
     private void addUserToDatabase(Member member) {
         String memberId = member.getUserId();
-        mRef.child("users").child(memberId).setValue(member);
+        usersRef.child(memberId).setValue(member);
     }
-
 
 }
