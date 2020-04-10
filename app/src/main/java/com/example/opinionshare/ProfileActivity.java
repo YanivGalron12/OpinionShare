@@ -71,7 +71,9 @@ public class ProfileActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference usersRef;
+    String userToDisplay_ID;
     String memberId;
+    Member userToDisplay = new Member();
     Member member = new Member();
 
 
@@ -92,6 +94,10 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+
+        Intent intent = getIntent();
+        userToDisplay_ID = intent.getStringExtra("USER_TO_DISPLAY");
 
         signout_btn = findViewById(R.id.signout_btn);
         info_btn= findViewById(R.id.info_btn);
@@ -142,7 +148,17 @@ public class ProfileActivity extends AppCompatActivity {
 
         String userDisplayName = user.getDisplayName();
         Uri photoUri =  user.getPhotoUrl();
-
+        if (!userToDisplay_ID.equals(memberId)){
+            signout_btn.setEnabled(false);
+            signout_btn.setVisibility(View.INVISIBLE);
+            info_btn.setEnabled(false);
+            info_btn.setVisibility(View.INVISIBLE);
+        }else{
+            signout_btn.setEnabled(true);
+            signout_btn.setVisibility(View.VISIBLE);
+            info_btn.setEnabled(true);
+            info_btn.setVisibility(View.VISIBLE);
+        }
 
         signout_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,13 +191,25 @@ public class ProfileActivity extends AppCompatActivity {
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
-                    member = dataSnapshot.child(memberId).getValue(Member.class);
-                    username_textview.setText(member.getUsername());
-                    if(!member.getProfilePhotoUri().equals("NoPhoto")){
-                        Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
+                    if (userToDisplay_ID.equals(memberId)){
+                        member = dataSnapshot.child(memberId).getValue(Member.class);
+                        username_textview.setText(member.getUsername());
+                        if(!member.getProfilePhotoUri().equals("NoPhoto")){
+                            Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
+                        }else {
+                            Picasso.get().load("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcThwba7bWlXMP_8RyrorKR_NqUpHKlZMBcAJNxzdOMiOC7d5csj&usqp=CAU").into(profileImage);
+                        }
                     }else{
-                        Picasso.get().load("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcThwba7bWlXMP_8RyrorKR_NqUpHKlZMBcAJNxzdOMiOC7d5csj&usqp=CAU").into(profileImage);
+                        userToDisplay = dataSnapshot.child(userToDisplay_ID).getValue(Member.class);
+                        username_textview.setText(userToDisplay.getUsername());
+                        if(!userToDisplay.getProfilePhotoUri().equals("NoPhoto")){
+                            Picasso.get().load(userToDisplay.getProfilePhotoUri()).into(profileImage);
+                        }else{
+                            Picasso.get().load("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcThwba7bWlXMP_8RyrorKR_NqUpHKlZMBcAJNxzdOMiOC7d5csj&usqp=CAU").into(profileImage);
+                        }
                     }
+
+
                 } else {
                     // TODO: change else actions
                     Toast.makeText(ProfileActivity.this, "data does not exist", Toast.LENGTH_LONG).show();

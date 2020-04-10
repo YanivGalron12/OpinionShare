@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -28,7 +29,7 @@ import java.util.List;
 
 public class ExploreActivity extends AppCompatActivity {
 
-
+    private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     private static final String TAG = "TAG";
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference usersRef;
@@ -38,10 +39,12 @@ public class ExploreActivity extends AppCompatActivity {
 
 
     //Set UI Variables
+    BottomNavigationView bottomNavigationView;
     SearchView searchView;
     ListView listView;
 
-    ArrayList<String> list = new ArrayList<>();
+    ArrayList<String> userNamelist = new ArrayList<>();
+    ArrayList<String> userIdlist = new ArrayList<>();
     ArrayAdapter<String> adapter;
 
     @Override
@@ -58,12 +61,13 @@ public class ExploreActivity extends AppCompatActivity {
         memberId = user.getUid();
         member = new Member();
 
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
         searchView = findViewById(R.id.searchView);
         listView = findViewById(R.id.listView);
 
 //        listView.setVisibility(View.INVISIBLE);
 
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userNamelist);
         listView.setAdapter(adapter);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -76,7 +80,7 @@ public class ExploreActivity extends AppCompatActivity {
             public boolean onQueryTextChange(String newText) {
                 adapter.getFilter().filter(newText);
                 if (newText.equals("")) {
-//                    listView.setVisibility(View.INVISIBLE);
+                    listView.setVisibility(View.INVISIBLE);
                 } else {
                     listView.setVisibility(View.VISIBLE);
                 }
@@ -85,11 +89,17 @@ public class ExploreActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        // Set Profile Selected
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // go to profile activity and pass to that activity witch user as been selected and is ID
+                // over there show the profile according to the selected user ID
+                Intent intent = new Intent(ExploreActivity.this,ProfileActivity.class);
+                intent.putExtra(USER_TO_DISPLAY,userIdlist.get(position));
+                startActivity(intent);
+            }
+        });
         bottomNavigationView.setSelectedItemId(R.id.explore);
-        // Perform ItemSelectedListener
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -158,8 +168,9 @@ public class ExploreActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot d: dataSnapshot.getChildren()){
-                        String tD = d.getValue(String.class);
-                        list.add(tD);
+                        String[] tD = d.getValue(String[].class);
+                        userNamelist.add(tD[0]);
+                        userIdlist.add(tD[1]);
                     }
                 } else {
                     // TODO: change else actions

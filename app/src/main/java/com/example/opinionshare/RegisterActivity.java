@@ -43,6 +43,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final String TAG = "TAG";
+    private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     // add Firebase Database stuff
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference usersRef;
@@ -55,7 +56,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     // member details
 //    GenericTypeIndicator<List<String>> t = new GenericTypeIndicator<List<String>>() {};
-    ArrayList<String> usersList = new ArrayList<>();
+    ArrayList<String[]> usersList = new ArrayList<>();
+    String[] newUserToAdd;
     String memberProfilePhotoUri;
     String memberPhoneNumber;
     String memberUserName;
@@ -96,12 +98,11 @@ public class RegisterActivity extends AppCompatActivity {
         usersListRef = mFirebaseDatabase.getReference().child("usersList");
 
         memberId = user.getUid();
-        Toast.makeText(getApplicationContext(),"memberId:"+memberId,Toast.LENGTH_LONG).show();
-        /**need to add the <10000 msec because otherwise the app will think this is a new user
-         * even if the user is already been in the RegisterActivity
-         * (if he didn't logged out since)
-        **/
-         if ((date.getTime() - metadata.getLastSignInTimestamp()<10000) && (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp())) {
+        /**need to add the isTaskRoot() because otherwise the app will think this is a new user
+         * even if the user is already been in the RegisterActivity and just wanted to come back
+         * and change stuff at the same logging session (if he didn't logged out since)
+         **/
+        if ((isTaskRoot()) && (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp())) {
             // The user is new. Save all the user's data you can get
             // Object.requireNoNull was added by android studio suggestions
             memberEmail = user.getEmail();
@@ -123,8 +124,6 @@ public class RegisterActivity extends AppCompatActivity {
             // TODO: create UI platform for adding more information about the new user
         } else {
             // This is an existing user get Member information from ds
-//            member = new Member(); // I Thinks we need to declare empty Member in order for the
-//             addValueEventListener to be able to retrieve data to it
         }
         continue_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,19 +131,22 @@ public class RegisterActivity extends AppCompatActivity {
                 member.setEmail(edit_text_email.getText().toString());
                 member.setName(edit_text_fullname.getText().toString());
                 newUserName = edit_text_username.getText().toString();
-                if (!newUserName.equals("")  ) {
-                    if (!newUserName.equals(memberUserName)){
+                if (!newUserName.equals("")) {
+                    if (!newUserName.equals(memberUserName)) {
                         member.setUsername(newUserName);
                         Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
-                        usersList.add(newUserName);
+                        newUserToAdd = new String[]{memberUserName,memberId};
+                        usersList.add(newUserToAdd);
                     }
-                    startActivity(new Intent(RegisterActivity.this, ProfileActivity.class));
+                    Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
+                    intent.putExtra(USER_TO_DISPLAY, memberId);
+                    startActivity(intent);
+                    finish();
                     addUserToDatabase(member);
                     usersListRef.setValue(usersList);
                 } else {
                     Toast.makeText(RegisterActivity.this, "UserName can't be empty", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
         change_profile_photo_TextView.setOnClickListener(new View.OnClickListener() {
@@ -152,7 +154,6 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent galleyIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(galleyIntent, RESULT_LOAD_IMAGE);
-
             }
         });
     }
@@ -207,22 +208,19 @@ public class RegisterActivity extends AppCompatActivity {
                     memberPhoneNumber = member.getPhoneNumber();
                     memberProfilePhotoUri = member.getProfilePhotoUri();
                     memberUserName = member.getUsername();
-
-                    if (!memberUserName.equals("")) {
-                        usersList.add(memberUserName);
-                    }
-
+//
+//                    if (!memberUserName.equals("")) {
+//                        usersList.add(memberUserName);
+//                    }
                     edit_text_email.setText(memberEmail);
                     edit_text_fullname.setText(memberName);
                     edit_text_username.setText(memberUserName);
                     Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
-
                 } else {
                     // TODO: change else actions
                     Toast.makeText(RegisterActivity.this, "data does not exist", Toast.LENGTH_LONG).show();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Failed to read value
@@ -239,15 +237,15 @@ public class RegisterActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
 
-                    for (DataSnapshot d: dataSnapshot.getChildren()){
-                        String tD = d.getValue(String.class);
+                    for (DataSnapshot d : dataSnapshot.getChildren()) {
+                        String[] tD = d.getValue(String[].class);
                         usersList.add(tD);
                     }
-                    memberUserName = member.getUsername();
-                    edit_text_username.setText(memberUserName);
-                    if (!memberUserName.equals("")) {
-                        usersList.add(memberUserName);
-                    }
+//                    memberUserName = member.getUsername();
+//                    edit_text_username.setText(memberUserName);
+//                    if (!memberUserName.equals("")) {
+//                        usersList.add(memberUserName);
+//                    }
                 } else {
                     // TODO: change else actions
                     Toast.makeText(RegisterActivity.this, "users list data does not exist", Toast.LENGTH_LONG).show();
