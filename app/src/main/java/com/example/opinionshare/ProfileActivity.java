@@ -45,6 +45,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -61,6 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
     TextView text;
     Button signout_btn;
     Button info_btn;
+    Button addfriend_btn;
 
     CircleImageView profileImage;
 
@@ -75,6 +77,9 @@ public class ProfileActivity extends AppCompatActivity {
     String memberId;
     Member userToDisplay = new Member();
     Member member = new Member();
+    ArrayList<String> friendList=new ArrayList<>();
+    boolean addfriend=false;
+    boolean removefriend=false;
 
 
 
@@ -101,6 +106,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         signout_btn = findViewById(R.id.signout_btn);
         info_btn= findViewById(R.id.info_btn);
+        addfriend_btn=findViewById(R.id.addfriend_btn);
         text = findViewById(R.id.text);
         profileImage = findViewById(R.id.profileImage);
         username_textview = findViewById(R.id.username_textview);
@@ -146,6 +152,8 @@ public class ProfileActivity extends AppCompatActivity {
         usersRef = mFirebaseDatabase.getReference().child("users");
         memberId = user.getUid();
 
+
+
         String userDisplayName = user.getDisplayName();
         Uri photoUri =  user.getPhotoUrl();
         if (!userToDisplay_ID.equals(memberId)){
@@ -153,11 +161,16 @@ public class ProfileActivity extends AppCompatActivity {
             signout_btn.setVisibility(View.INVISIBLE);
             info_btn.setEnabled(false);
             info_btn.setVisibility(View.INVISIBLE);
+            addfriend_btn.setEnabled(true);
+            addfriend_btn.setVisibility(View.VISIBLE);
+
         }else{
             signout_btn.setEnabled(true);
             signout_btn.setVisibility(View.VISIBLE);
             info_btn.setEnabled(true);
             info_btn.setVisibility(View.VISIBLE);
+            addfriend_btn.setEnabled(false);
+            addfriend_btn.setVisibility(View.INVISIBLE);
         }
 
         signout_btn.setOnClickListener(new View.OnClickListener() {
@@ -172,6 +185,7 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(new Intent(ProfileActivity.this, RegisterActivity.class));
             }
         });
+
 
 
 
@@ -199,14 +213,47 @@ public class ProfileActivity extends AppCompatActivity {
                         }else {
                             Picasso.get().load("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcThwba7bWlXMP_8RyrorKR_NqUpHKlZMBcAJNxzdOMiOC7d5csj&usqp=CAU").into(profileImage);
                         }
-                    }else{
+                    }else {
                         userToDisplay = dataSnapshot.child(userToDisplay_ID).getValue(Member.class);
+                        member = dataSnapshot.child(memberId).getValue(Member.class);
                         username_textview.setText(userToDisplay.getUsername());
-                        if(!userToDisplay.getProfilePhotoUri().equals("NoPhoto")){
+                        if (!userToDisplay.getProfilePhotoUri().equals("NoPhoto")) {
                             Picasso.get().load(userToDisplay.getProfilePhotoUri()).into(profileImage);
-                        }else{
+                        } else {
                             Picasso.get().load("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcThwba7bWlXMP_8RyrorKR_NqUpHKlZMBcAJNxzdOMiOC7d5csj&usqp=CAU").into(profileImage);
                         }
+                        if (member.getFriendList() != null) {
+                            friendList = (ArrayList<String>) member.getFriendList();
+                            if (friendList.contains(userToDisplay_ID)) {
+                                addfriend_btn.setText("remove friend");
+                            }
+                        }
+                        addfriend_btn.setEnabled(true);
+                        addfriend_btn.setVisibility(View.VISIBLE);
+
+
+
+                        addfriend_btn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                if (member.getFriendList() != null) {
+                                    friendList = (ArrayList<String>) member.getFriendList();
+                                    if (friendList.contains(userToDisplay_ID))
+                                        friendList.remove(userToDisplay_ID);
+                                        addfriend_btn.setText("add friend");
+                                }
+                                else
+                                {
+                                    friendList.add(userToDisplay_ID);
+                                    addfriend_btn.setText("remove friend");
+                                }
+
+                                member.setFriendList(friendList);
+                                addUserToDatabase(member);
+
+
+                            }
+                        });
                     }
 
 
@@ -234,5 +281,9 @@ public class ProfileActivity extends AppCompatActivity {
                         finish();
                     }
                 });
+    }
+    private void addUserToDatabase(Member member) {
+        String memberId = member.getUserId();
+        usersRef.child(memberId).setValue(member);
     }
 }

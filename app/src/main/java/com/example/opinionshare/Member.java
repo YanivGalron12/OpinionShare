@@ -1,15 +1,7 @@
 package com.example.opinionshare;
 
-import android.net.Uri;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 
 public class Member {
@@ -21,7 +13,8 @@ public class Member {
     private String phoneNumber;
     private String profilePhotoUri;
     private Integer age, likeCounter;
-    private List<String> friendList, categoryList;
+    private ArrayList<String> friendList;
+    private ArrayList<String> categoryList;
 
     public Member() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -37,7 +30,7 @@ public class Member {
         this.profilePhotoUri = profilePhotoUri;
         this.age = 1000;
         this.likeCounter = 0;
-        this.friendList = new ArrayList<String>();
+        this.friendList = friendList;
         this.categoryList = new ArrayList<String>();
 
     }
@@ -118,8 +111,8 @@ public class Member {
         return friendList;
     }
 
-    public void setFriendList(List<String> friendList) {
-        this.friendList = friendList;
+    public void setFriendList(ArrayList<String> friendList) {
+        this.friendList =  friendList;
     }
 
     public List<String> getCategoryList() {
@@ -127,6 +120,6 @@ public class Member {
     }
 
     public void setCategoryList(List<String> categoryList) {
-        this.categoryList = categoryList;
+        this.categoryList = (ArrayList<String>) categoryList;
     }
 }

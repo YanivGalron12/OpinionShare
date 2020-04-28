@@ -110,7 +110,10 @@ public class ExploreActivity extends AppCompatActivity {
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.profile:
-                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                        Intent intent = new Intent(ExploreActivity.this, ProfileActivity.class);
+                        memberId=user.getUid();
+                        intent.putExtra(USER_TO_DISPLAY, memberId);
+                        startActivity(intent);
                         finish();
                         overridePendingTransition(0, 0);
                         return true;
@@ -168,9 +171,9 @@ public class ExploreActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot d: dataSnapshot.getChildren()){
-                        String[] tD = d.getValue(String[].class);
-                        userNamelist.add(tD[0]);
-                        userIdlist.add(tD[1]);
+                        UserToShow tD = d.getValue(UserToShow.class);
+                        userNamelist.add(tD.getUsername());
+                        userIdlist.add(tD.getId());
                     }
                 } else {
                     // TODO: change else actions

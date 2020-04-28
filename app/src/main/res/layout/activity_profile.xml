@@ -50,6 +50,17 @@
         app:civ_border_color="#FF000000"
         app:civ_border_width="2dp" />
 
+    <Button
+        android:id="@+id/addfriend_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="266dp"
+        android:text="Add Friend"
+        android:textAllCaps="false" />
+
+
 
     <Button
         android:id="@+id/signout_btn"
@@ -57,7 +68,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="62dp"
         android:text="Sign Out"
         android:textAllCaps="false"
         tools:ignore="HardcodedText" />

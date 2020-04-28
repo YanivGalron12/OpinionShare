@@ -48,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseUserMetadata metadata;
     List<AuthUI.IdpConfig> providers;
-
+    String memberId;
+    private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,10 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
             // user is already signed in
-            startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+            memberId=user.getUid();
+            intent.putExtra(USER_TO_DISPLAY, memberId);
+            startActivity(intent);
             finish();
             return; // need return because we don't need to execute showSignInOption and set providers
         }
@@ -114,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                     // This is an existing user.
                     // TODO: show welcome back screen?
                     Toast.makeText(this, "Welcome back my old friend", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                    startActivity(new Intent(MainActivity.this, RegisterActivity.class));
                     finish();
                 }
             } else {

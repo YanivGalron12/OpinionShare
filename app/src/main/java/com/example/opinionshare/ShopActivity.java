@@ -25,6 +25,7 @@ public class ShopActivity extends AppCompatActivity {
     private DatabaseReference mRef;
     String memberId;
     Member member;
+    private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +60,10 @@ public class ShopActivity extends AppCompatActivity {
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile:
-                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                        Intent intent = new Intent(ShopActivity.this, ProfileActivity.class);
+                        memberId=user.getUid();
+                        intent.putExtra(USER_TO_DISPLAY, memberId);
+                        startActivity(intent);
                         finish();
                         overridePendingTransition(0,0);
                         return true;

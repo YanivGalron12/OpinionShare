@@ -19,8 +19,10 @@ import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 import com.firebase.client.GenericTypeIndicator;
+import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.common.collect.Lists;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -32,10 +34,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.remote.Stream;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,7 +61,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     // member details
 //    GenericTypeIndicator<List<String>> t = new GenericTypeIndicator<List<String>>() {};
-    ArrayList<String[]> usersList = new ArrayList<>();
+    List<UserToShow> usersList = new ArrayList<>();
+
+
     String[] newUserToAdd;
     String memberProfilePhotoUri;
     String memberPhoneNumber;
@@ -66,8 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
     String memberName;
     String memberId;
     Member member = new Member();
-
-
+//    ArrayList<String> friendslist = new ArrayList<>();
     // Activity UI
     TextView change_profile_photo_TextView;
     EditText edit_text_username;
@@ -96,8 +102,8 @@ public class RegisterActivity extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         usersRef = mFirebaseDatabase.getReference().child("users");
         usersListRef = mFirebaseDatabase.getReference().child("usersList");
-
         memberId = user.getUid();
+
         /**need to add the isTaskRoot() because otherwise the app will think this is a new user
          * even if the user is already been in the RegisterActivity and just wanted to come back
          * and change stuff at the same logging session (if he didn't logged out since)
@@ -109,12 +115,15 @@ public class RegisterActivity extends AppCompatActivity {
             memberName = user.getDisplayName();
             memberPhoneNumber = user.getPhoneNumber();
 
+
+
             if (user.getPhotoUrl() != null) {
                 memberProfilePhotoUri = user.getPhotoUrl().toString();
             } else {
                 memberProfilePhotoUri = "NoPhoto";
             }
             memberUserName = edit_text_username.getText().toString();
+//            friendslist.add(memberId);
             member = new Member(memberId, memberName, memberEmail, memberProfilePhotoUri, memberPhoneNumber, memberUserName);
             addUserToDatabase(member); // Add this member to RTDB (Real Time Database)
 
@@ -133,17 +142,23 @@ public class RegisterActivity extends AppCompatActivity {
                 newUserName = edit_text_username.getText().toString();
                 if (!newUserName.equals("")) {
                     if (!newUserName.equals(memberUserName)) {
+//                        String[] oldUserToRemove = new String[]{memberUserName,memberId};
                         member.setUsername(newUserName);
+                        memberUserName = member.getUsername();
                         Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
-                        newUserToAdd = new String[]{memberUserName,memberId};
+                        UserToShow newUserToAdd = new UserToShow(memberUserName,memberId);
                         usersList.add(newUserToAdd);
+//                        friendslist.add(newUserToAdd.getUsername());
+//                        usersList.remove(oldUserToRemove);
                     }
+
                     Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
                     intent.putExtra(USER_TO_DISPLAY, memberId);
                     startActivity(intent);
                     finish();
                     addUserToDatabase(member);
                     usersListRef.setValue(usersList);
+
                 } else {
                     Toast.makeText(RegisterActivity.this, "UserName can't be empty", Toast.LENGTH_SHORT).show();
                 }
@@ -200,14 +215,22 @@ public class RegisterActivity extends AppCompatActivity {
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
-                    member = dataSnapshot.child(memberId).getValue(Member.class);
+                    for (DataSnapshot d : dataSnapshot.getChildren()) {
+                        Object value = d.getValue();
 
-                    memberName = member.getName();
-                    memberEmail = member.getEmail();
-                    memberUserName = member.getUsername();
-                    memberPhoneNumber = member.getPhoneNumber();
-                    memberProfilePhotoUri = member.getProfilePhotoUri();
-                    memberUserName = member.getUsername();
+                        if(value instanceof List) {
+                            List<Object> t = (List<Object>) value;
+                            member = new Member((String)t.get(4), (String) t.get(1), (String) t.get(6), (String) t.get(2), (String) t.get(0), (String) t.get(8));
+
+                            // do your magic with values
+                        }
+                        memberName = member.getName();
+                        memberEmail = member.getEmail();
+                        memberUserName = member.getUsername();
+                        memberPhoneNumber = member.getPhoneNumber();
+                        memberProfilePhotoUri = member.getProfilePhotoUri();
+                        memberUserName = member.getUsername();
+                    }
 //
 //                    if (!memberUserName.equals("")) {
 //                        usersList.add(memberUserName);
@@ -225,6 +248,8 @@ public class RegisterActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Failed to read value
                 Log.w(TAG, "Failed to read value.", databaseError.toException());
+
+
             }
         });
 
@@ -238,8 +263,32 @@ public class RegisterActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
 
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
-                        String[] tD = d.getValue(String[].class);
+
+                        Object value = d.getValue();
+                        UserToShow tD =new UserToShow();
+                        if(value instanceof List) {
+                            List<Object> t = (List<Object>) value;
+                            tD.setId((String) t.get(0));
+                            tD.setUsername((String) t.get(1));
+                            // do your magic with values
+                        }
+                        else {
+                            // handle other possible types
+                            HashMap<String, String> map = (HashMap<String, String>) value;
+                            //Getting Collection of values from HashMap
+                            Collection<String> values = map.values();
+                            //Creating an ArrayList of values
+                            ArrayList<String> listOfValues = new ArrayList<String>(values);
+                            tD.setId(listOfValues.get(0));
+                            tD.setUsername(listOfValues.get(1));
+
+
+                        }
+                        memberName=tD.getUsername();
                         usersList.add(tD);
+
+
+
                     }
 //                    memberUserName = member.getUsername();
 //                    edit_text_username.setText(memberUserName);
@@ -265,6 +314,6 @@ public class RegisterActivity extends AppCompatActivity {
     private void addUserToDatabase(Member member) {
         String memberId = member.getUserId();
         usersRef.child(memberId).setValue(member);
-    }
+}
 
 }

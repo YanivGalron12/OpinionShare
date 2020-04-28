@@ -29,6 +29,8 @@ public class HomeActivity extends AppCompatActivity {
     private DatabaseReference mRef;
     String memberId;
     Member member;
+    private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
+
 
     // Set UI Variables
     TextView username_textview;
@@ -55,7 +57,10 @@ public class HomeActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.profile:
-                        startActivity(new Intent(getApplicationContext(),ProfileActivity.class));
+                        Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                        memberId=user.getUid();
+                        intent.putExtra(USER_TO_DISPLAY, memberId);
+                        startActivity(intent);
                         finish();
                         overridePendingTransition(0,0);
                         return true;
