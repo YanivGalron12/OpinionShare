@@ -77,11 +77,7 @@ public class ProfileActivity extends AppCompatActivity {
     String memberId;
     Member userToDisplay = new Member();
     Member member = new Member();
-    ArrayList<String> friendList=new ArrayList<>();
-    boolean addfriend=false;
-    boolean removefriend=false;
-
-
+    ArrayList<String> friendList = new ArrayList<>();
 
 //    // TODO: put this onBackPressed function on the main activity of the app
 //    // TODO: take care of back button bug on other activities -
@@ -105,8 +101,8 @@ public class ProfileActivity extends AppCompatActivity {
         userToDisplay_ID = intent.getStringExtra("USER_TO_DISPLAY");
 
         signout_btn = findViewById(R.id.signout_btn);
-        info_btn= findViewById(R.id.info_btn);
-        addfriend_btn=findViewById(R.id.addfriend_btn);
+        info_btn = findViewById(R.id.info_btn);
+        addfriend_btn = findViewById(R.id.addfriend_btn);
         text = findViewById(R.id.text);
         profileImage = findViewById(R.id.profileImage);
         username_textview = findViewById(R.id.username_textview);
@@ -119,26 +115,26 @@ public class ProfileActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.home:
-                        startActivity(new Intent(getApplicationContext(),HomeActivity.class));
+                        startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                         finish();
-                        overridePendingTransition(0,0);
+                        overridePendingTransition(0, 0);
                         return true;
                     case R.id.explore:
-                        startActivity(new Intent(getApplicationContext(),ExploreActivity.class));
+                        startActivity(new Intent(getApplicationContext(), ExploreActivity.class));
                         finish();
-                        overridePendingTransition(0,0);
+                        overridePendingTransition(0, 0);
                         return true;
                     case R.id.inbox:
                         startActivity(new Intent(getApplicationContext(), InboxActivity.class));
                         finish();
-                        overridePendingTransition(0,0);
+                        overridePendingTransition(0, 0);
                         return true;
                     case R.id.shop:
                         startActivity(new Intent(getApplicationContext(), ShopActivity.class));
                         finish();
-                        overridePendingTransition(0,0);
+                        overridePendingTransition(0, 0);
                         return true;
                     case R.id.profile:
                         return true;
@@ -153,24 +149,23 @@ public class ProfileActivity extends AppCompatActivity {
         memberId = user.getUid();
 
 
-
         String userDisplayName = user.getDisplayName();
-        Uri photoUri =  user.getPhotoUrl();
-        if (!userToDisplay_ID.equals(memberId)){
+        Uri photoUri = user.getPhotoUrl();
+        if (!userToDisplay_ID.equals(memberId)) {
             signout_btn.setEnabled(false);
-            signout_btn.setVisibility(View.INVISIBLE);
+            signout_btn.setVisibility(View.GONE);
             info_btn.setEnabled(false);
-            info_btn.setVisibility(View.INVISIBLE);
+            info_btn.setVisibility(View.GONE);
             addfriend_btn.setEnabled(true);
             addfriend_btn.setVisibility(View.VISIBLE);
 
-        }else{
+        } else {
             signout_btn.setEnabled(true);
             signout_btn.setVisibility(View.VISIBLE);
             info_btn.setEnabled(true);
             info_btn.setVisibility(View.VISIBLE);
             addfriend_btn.setEnabled(false);
-            addfriend_btn.setVisibility(View.INVISIBLE);
+            addfriend_btn.setVisibility(View.GONE);
         }
 
         signout_btn.setOnClickListener(new View.OnClickListener() {
@@ -186,12 +181,24 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        addfriend_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (member.getFriendList() != null) {
+                    friendList = (ArrayList<String>) member.getFriendList();
+                    if (friendList.contains(userToDisplay_ID))
+                        friendList.remove(userToDisplay_ID);
+                    addfriend_btn.setText("add friend");
+                } else {
+                    friendList.add(userToDisplay_ID);
+                    addfriend_btn.setText("remove friend");
+                }
+                member.setFriendList(friendList);
+                addUserToDatabase(member);
 
-
-
-
+            }
+        });
     }
-
 
     @Override
     protected void onStart() {
@@ -205,15 +212,15 @@ public class ProfileActivity extends AppCompatActivity {
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
-                    if (userToDisplay_ID.equals(memberId)){
+                    if (userToDisplay_ID.equals(memberId)) {
                         member = dataSnapshot.child(memberId).getValue(Member.class);
                         username_textview.setText(member.getUsername());
-                        if(!member.getProfilePhotoUri().equals("NoPhoto")){
+                        if (!member.getProfilePhotoUri().equals("NoPhoto")) {
                             Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
-                        }else {
+                        } else {
                             Picasso.get().load("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcThwba7bWlXMP_8RyrorKR_NqUpHKlZMBcAJNxzdOMiOC7d5csj&usqp=CAU").into(profileImage);
                         }
-                    }else {
+                    } else {
                         userToDisplay = dataSnapshot.child(userToDisplay_ID).getValue(Member.class);
                         member = dataSnapshot.child(memberId).getValue(Member.class);
                         username_textview.setText(userToDisplay.getUsername());
@@ -228,34 +235,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 addfriend_btn.setText("remove friend");
                             }
                         }
-                        addfriend_btn.setEnabled(true);
-                        addfriend_btn.setVisibility(View.VISIBLE);
-
-
-
-                        addfriend_btn.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                if (member.getFriendList() != null) {
-                                    friendList = (ArrayList<String>) member.getFriendList();
-                                    if (friendList.contains(userToDisplay_ID))
-                                        friendList.remove(userToDisplay_ID);
-                                        addfriend_btn.setText("add friend");
-                                }
-                                else
-                                {
-                                    friendList.add(userToDisplay_ID);
-                                    addfriend_btn.setText("remove friend");
-                                }
-
-                                member.setFriendList(friendList);
-                                addUserToDatabase(member);
-
-
-                            }
-                        });
                     }
-
 
                 } else {
                     // TODO: change else actions
@@ -270,6 +250,7 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
+
     private void signOut() {
         AuthUI.getInstance()
                 .signOut(this)
@@ -282,6 +263,7 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 });
     }
+
     private void addUserToDatabase(Member member) {
         String memberId = member.getUserId();
         usersRef.child(memberId).setValue(member);

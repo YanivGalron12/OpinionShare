@@ -55,7 +55,9 @@ public class RegisterActivity extends AppCompatActivity {
     private DatabaseReference usersListRef;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    FirebaseUserMetadata metadata;
+    FirebaseUser user = auth.getCurrentUser();
+    FirebaseUserMetadata metadata = user.getMetadata();
+
     Date date = new Date();
     private DocumentReference mDocRef;
 
@@ -73,7 +75,7 @@ public class RegisterActivity extends AppCompatActivity {
     String memberName;
     String memberId;
     Member member = new Member();
-//    ArrayList<String> friendslist = new ArrayList<>();
+    //    ArrayList<String> friendslist = new ArrayList<>();
     // Activity UI
     TextView change_profile_photo_TextView;
     EditText edit_text_username;
@@ -95,10 +97,6 @@ public class RegisterActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profileImage);
 
 
-        FirebaseUser user = auth.getCurrentUser();
-        // TODO: check what to do with comment on .getMetadata
-        assert user != null; // This was added by android studio suggestions
-        metadata = user.getMetadata();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         usersRef = mFirebaseDatabase.getReference().child("users");
         usersListRef = mFirebaseDatabase.getReference().child("usersList");
@@ -111,25 +109,9 @@ public class RegisterActivity extends AppCompatActivity {
         if ((isTaskRoot()) && (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp())) {
             // The user is new. Save all the user's data you can get
             // Object.requireNoNull was added by android studio suggestions
-            memberEmail = user.getEmail();
-            memberName = user.getDisplayName();
-            memberPhoneNumber = user.getPhoneNumber();
+            createMemberForUser(user);
 
 
-
-            if (user.getPhotoUrl() != null) {
-                memberProfilePhotoUri = user.getPhotoUrl().toString();
-            } else {
-                memberProfilePhotoUri = "NoPhoto";
-            }
-            memberUserName = edit_text_username.getText().toString();
-//            friendslist.add(memberId);
-            member = new Member(memberId, memberName, memberEmail, memberProfilePhotoUri, memberPhoneNumber, memberUserName);
-            addUserToDatabase(member); // Add this member to RTDB (Real Time Database)
-
-            // Display user details
-            edit_text_email.setText(memberEmail);
-            edit_text_fullname.setText(memberName);
             // TODO: create UI platform for adding more information about the new user
         } else {
             // This is an existing user get Member information from ds
@@ -146,7 +128,7 @@ public class RegisterActivity extends AppCompatActivity {
                         member.setUsername(newUserName);
                         memberUserName = member.getUsername();
                         Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
-                        UserToShow newUserToAdd = new UserToShow(memberUserName,memberId);
+                        UserToShow newUserToAdd = new UserToShow(memberUserName, memberId);
                         usersList.add(newUserToAdd);
 //                        friendslist.add(newUserToAdd.getUsername());
 //                        usersList.remove(oldUserToRemove);
@@ -171,6 +153,27 @@ public class RegisterActivity extends AppCompatActivity {
                 startActivityForResult(galleyIntent, RESULT_LOAD_IMAGE);
             }
         });
+    }
+
+    private void createMemberForUser(FirebaseUser user) {
+        memberEmail = user.getEmail();
+        memberName = user.getDisplayName();
+        memberPhoneNumber = user.getPhoneNumber();
+
+
+        if (user.getPhotoUrl() != null) {
+            memberProfilePhotoUri = user.getPhotoUrl().toString();
+        } else {
+            memberProfilePhotoUri = "NoPhoto";
+        }
+        memberUserName = edit_text_username.getText().toString();
+//            friendslist.add(memberId);
+        member = new Member(memberId, memberName, memberEmail, memberProfilePhotoUri, memberPhoneNumber, memberUserName);
+        addUserToDatabase(member); // Add this member to RTDB (Real Time Database)
+        // Display user details
+        edit_text_email.setText(memberEmail);
+        edit_text_fullname.setText(memberName);
+
     }
 
     @Override
@@ -214,23 +217,15 @@ public class RegisterActivity extends AppCompatActivity {
                 // whenever data at this Location is updated
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot d : dataSnapshot.getChildren()) {
-                        Object value = d.getValue();
+                if (dataSnapshot.child(memberId).exists()) {
+                    member = dataSnapshot.child(memberId).getValue(Member.class);
+                    memberName = member.getName();
+                    memberEmail = member.getEmail();
+                    memberUserName = member.getUsername();
+                    memberPhoneNumber = member.getPhoneNumber();
+                    memberProfilePhotoUri = member.getProfilePhotoUri();
+                    memberUserName = member.getUsername();
 
-                        if(value instanceof List) {
-                            List<Object> t = (List<Object>) value;
-                            member = new Member((String)t.get(4), (String) t.get(1), (String) t.get(6), (String) t.get(2), (String) t.get(0), (String) t.get(8));
-
-                            // do your magic with values
-                        }
-                        memberName = member.getName();
-                        memberEmail = member.getEmail();
-                        memberUserName = member.getUsername();
-                        memberPhoneNumber = member.getPhoneNumber();
-                        memberProfilePhotoUri = member.getProfilePhotoUri();
-                        memberUserName = member.getUsername();
-                    }
 //
 //                    if (!memberUserName.equals("")) {
 //                        usersList.add(memberUserName);
@@ -240,16 +235,19 @@ public class RegisterActivity extends AppCompatActivity {
                     edit_text_username.setText(memberUserName);
                     Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
                 } else {
+                    if (!(metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp())) {
+                        FirebaseUser user = auth.getCurrentUser();
+                        createMemberForUser(user);
+                    }
                     // TODO: change else actions
                     Toast.makeText(RegisterActivity.this, "data does not exist", Toast.LENGTH_LONG).show();
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Failed to read value
                 Log.w(TAG, "Failed to read value.", databaseError.toException());
-
-
             }
         });
 
@@ -265,14 +263,13 @@ public class RegisterActivity extends AppCompatActivity {
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
 
                         Object value = d.getValue();
-                        UserToShow tD =new UserToShow();
-                        if(value instanceof List) {
+                        UserToShow tD = new UserToShow();
+                        if (value instanceof List) {
                             List<Object> t = (List<Object>) value;
                             tD.setId((String) t.get(0));
                             tD.setUsername((String) t.get(1));
                             // do your magic with values
-                        }
-                        else {
+                        } else {
                             // handle other possible types
                             HashMap<String, String> map = (HashMap<String, String>) value;
                             //Getting Collection of values from HashMap
@@ -282,13 +279,9 @@ public class RegisterActivity extends AppCompatActivity {
                             tD.setId(listOfValues.get(0));
                             tD.setUsername(listOfValues.get(1));
 
-
                         }
-                        memberName=tD.getUsername();
+                        memberName = tD.getUsername();
                         usersList.add(tD);
-
-
-
                     }
 //                    memberUserName = member.getUsername();
 //                    edit_text_username.setText(memberUserName);
@@ -308,12 +301,11 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-
     }
 
     private void addUserToDatabase(Member member) {
         String memberId = member.getUserId();
         usersRef.child(memberId).setValue(member);
-}
+    }
 
 }
