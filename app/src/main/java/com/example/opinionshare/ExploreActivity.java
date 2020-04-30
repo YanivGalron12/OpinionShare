@@ -111,7 +111,7 @@ public class ExploreActivity extends AppCompatActivity {
                         return true;
                     case R.id.profile:
                         Intent intent = new Intent(ExploreActivity.this, ProfileActivity.class);
-                        memberId=user.getUid();
+                        memberId= user.getUid();
                         intent.putExtra(USER_TO_DISPLAY, memberId);
                         startActivity(intent);
                         finish();
