@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Posts {
 //
-//    private String name;
+ private String name;
 //    private String email;
 //    private String userId;
 //    private String userType;
