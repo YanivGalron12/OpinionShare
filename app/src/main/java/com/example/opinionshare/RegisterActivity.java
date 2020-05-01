@@ -5,7 +5,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -35,6 +37,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.remote.Stream;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -54,7 +60,7 @@ public class RegisterActivity extends AppCompatActivity {
     private DatabaseReference usersRef;
     private DatabaseReference usersListRef;
     FirebaseAuth auth = FirebaseAuth.getInstance();
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private StorageReference mStorageRef ;
     FirebaseUser user = auth.getCurrentUser();
     FirebaseUserMetadata metadata = user.getMetadata();
 
@@ -84,6 +90,7 @@ public class RegisterActivity extends AppCompatActivity {
     ImageView profileImage;
     Button continue_btn;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +104,10 @@ public class RegisterActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profileImage);
 
 
+
+
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mStorageRef = FirebaseStorage.getInstance().getReference().child("MemberProfilePhoto");
         usersRef = mFirebaseDatabase.getReference().child("users");
         usersListRef = mFirebaseDatabase.getReference().child("usersList");
         memberId = user.getUid();
@@ -116,6 +126,10 @@ public class RegisterActivity extends AppCompatActivity {
         } else {
             // This is an existing user get Member information from ds
         }
+
+
+
+
         continue_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -183,26 +197,21 @@ public class RegisterActivity extends AppCompatActivity {
             Uri selectedImage = data.getData();
             profileImage.setImageURI(selectedImage);
             // TODO: photo needs to be downloaded and then stored in our database (Firestore ?) as file
-//
-//            String path = "users/"+ memberId +"/pictures";
-//            // Add a new document with a generated ID
-//            db.collection(path)
-//                    .add()
-//                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                        @Override
-//                        public void onSuccess(DocumentReference documentReference) {
-//                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-//                        }
-//                    })
-//                    .addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            Log.w(TAG, "Error adding document", e);
-//                        }
-//                    });
+            StorageReference Imagename = mStorageRef.child("image"+selectedImage.getLastPathSegment());
+            Imagename.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Toast.makeText(RegisterActivity.this,"Uploaded",Toast.LENGTH_SHORT).show();
+                    Imagename.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            member.setProfilePhotoUri(uri.toString());
+                            addUserToDatabase(member);
+                        }
+                    });
+                }
+            });
 
-            member.setProfilePhotoUri(selectedImage.toString());
-            addUserToDatabase(member);
         }
     }
 
@@ -233,7 +242,9 @@ public class RegisterActivity extends AppCompatActivity {
                     edit_text_email.setText(memberEmail);
                     edit_text_fullname.setText(memberName);
                     edit_text_username.setText(memberUserName);
-                    Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
+                    Picasso.get().load(memberProfilePhotoUri).into(profileImage);
+
+
                 } else {
                     if (!(metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp())) {
                         FirebaseUser user = auth.getCurrentUser();
