@@ -69,16 +69,19 @@ public class RegisterActivity extends AppCompatActivity {
 
     // member details
 //    GenericTypeIndicator<List<String>> t = new GenericTypeIndicator<List<String>>() {};
-    List<UserToShow> usersList = new ArrayList<>();
+    List<String> usersList = new ArrayList<>();
+
 
 
     String[] newUserToAdd;
+    boolean userexists=false;
     String memberProfilePhotoUri;
     String memberPhoneNumber;
     String memberUserName;
     String memberEmail;
     String newUserName;
     String memberName;
+    String OldUserName;
     String memberId;
     Member member = new Member();
     //    ArrayList<String> friendslist = new ArrayList<>();
@@ -102,6 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
         edit_text_email = findViewById(R.id.edit_text_email);
         continue_btn = findViewById(R.id.continue_btn);
         profileImage = findViewById(R.id.profileImage);
+        OldUserName=edit_text_username.getText().toString();
 
 
 
@@ -125,6 +129,7 @@ public class RegisterActivity extends AppCompatActivity {
             // TODO: create UI platform for adding more information about the new user
         } else {
             // This is an existing user get Member information from ds
+            userexists=true;
         }
 
 
@@ -139,13 +144,14 @@ public class RegisterActivity extends AppCompatActivity {
                 if (!newUserName.equals("")) {
                     if (!newUserName.equals(memberUserName)) {
 //                        String[] oldUserToRemove = new String[]{memberUserName,memberId};
+                        usersList.remove(memberUserName);
                         member.setUsername(newUserName);
                         memberUserName = member.getUsername();
                         Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
-                        UserToShow newUserToAdd = new UserToShow(memberUserName, memberId);
-                        usersList.add(newUserToAdd);
+                        usersList.add(memberUserName);
+
 //                        friendslist.add(newUserToAdd.getUsername());
-//                        usersList.remove(oldUserToRemove);
+
                     }
 
                     Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
@@ -272,27 +278,28 @@ public class RegisterActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
 
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
-
-                        Object value = d.getValue();
-                        UserToShow tD = new UserToShow();
-                        if (value instanceof List) {
-                            List<Object> t = (List<Object>) value;
-                            tD.setId((String) t.get(0));
-                            tD.setUsername((String) t.get(1));
-                            // do your magic with values
-                        } else {
-                            // handle other possible types
-                            HashMap<String, String> map = (HashMap<String, String>) value;
-                            //Getting Collection of values from HashMap
-                            Collection<String> values = map.values();
-                            //Creating an ArrayList of values
-                            ArrayList<String> listOfValues = new ArrayList<String>(values);
-                            tD.setId(listOfValues.get(0));
-                            tD.setUsername(listOfValues.get(1));
-
-                        }
-                        memberName = tD.getUsername();
-                        usersList.add(tD);
+//
+//                        Object value = d.getValue();
+//                        UserToShow tD = new UserToShow();
+//                        if (value instanceof List) {
+//                            List<Object> t = (List<Object>) value;
+//                            tD.setId((String) t.get(0));
+//                            tD.setUsername((String) t.get(1));
+//                            // do your magic with values
+//                        } else {
+//                            // handle other possible types
+//                            HashMap<String, String> map = (HashMap<String, String>) value;
+//                            //Getting Collection of values from HashMap
+//                            Collection<String> values = map.values();
+//                            //Creating an ArrayList of values
+//                            ArrayList<String> listOfValues = new ArrayList<String>(values);
+//                            tD.setId(listOfValues.get(0));
+//                            tD.setUsername(listOfValues.get(1));
+//
+//                        }
+//                        memberName = tD.getUsername();
+                        memberName= (String) d.getValue();
+                        usersList.add(memberName);
                     }
 //                    memberUserName = member.getUsername();
 //                    edit_text_username.setText(memberUserName);
