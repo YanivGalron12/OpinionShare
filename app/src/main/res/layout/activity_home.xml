@@ -7,15 +7,64 @@
     tools:context=".HomeActivity">
 
 
-    <TextView
-        android:id="@+id/home"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Home"
-        android:textSize="50sp"
-        android:textStyle="bold" />
+    <!--  <Button
+         android:id="@+id/upload_btn"
+         android:layout_width="wrap_content"
+         android:layout_below="@+id/postLayout"
+         android:layout_centerHorizontal="true"
+         android:layout_height="wrap_content"
+         android:text="UploadPost" />
+ -->
 
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#f0ffa0"
+        android:scrollIndicators="right"
+        android:scrollbarStyle="insideOverlay"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/ImageOrVidLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/VideoOption"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="end"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginRight="90dp"
+                    android:layout_weight="1"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/musicandmultimedia"
+                    />
+
+                <ImageView
+                    android:id="@+id/ImageOption"
+                    android:layout_marginRight="50dp"
+
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="start"
+                    android:layout_weight="1"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/toolsandutensils" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
