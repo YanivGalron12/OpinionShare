@@ -105,7 +105,6 @@ public class RegisterActivity extends AppCompatActivity {
         usersRef = mFirebaseDatabase.getReference().child("users");
         usersListRef = mFirebaseDatabase.getReference().child("usersList");
         memberId = user.getUid();
-        UserToShow newUserToAdd = new UserToShow(OldUserName, memberId);
 
         /**need to add the isTaskRoot() because otherwise the app will think this is a new user
          * even if the user is already been in the RegisterActivity and just wanted to come back
@@ -135,7 +134,6 @@ public class RegisterActivity extends AppCompatActivity {
                         member.setUsername(newUserName);
                         memberUserName = member.getUsername();
                         Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
-                        UserToShow newUserToAdd = new UserToShow(memberUserName, memberId);
                         usersList.add(memberUserName);
 
 //                        friendslist.add(newUserToAdd.getUsername());
