@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
             // user is already signed in
-            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             memberId=user.getUid();
             intent.putExtra(USER_TO_DISPLAY, memberId);
             startActivity(intent);
