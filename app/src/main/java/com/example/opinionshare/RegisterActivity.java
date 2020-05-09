@@ -128,26 +128,40 @@ public class RegisterActivity extends AppCompatActivity {
                 member.setName(edit_text_fullname.getText().toString());
                 newUserName = edit_text_username.getText().toString();
                 if (!newUserName.equals("")) {
-                    if (!newUserName.equals(memberUserName)) {
+                    if (!newUserName.equals(memberUserName)&&!usersList.contains(newUserName)) {
 //                        String[] oldUserToRemove = new String[]{memberUserName,memberId};
                         usersList.remove(memberUserName);
                         member.setUsername(newUserName);
                         memberUserName = member.getUsername();
                         Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
                         usersList.add(memberUserName);
+                        Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
+                        intent.putExtra(USER_TO_DISPLAY, memberId);
+                        startActivity(intent);
+                        finish();
+                        addUserToDatabase(member);
+                        usersListRef.setValue(usersList);
+
 
 //                        friendslist.add(newUserToAdd.getUsername());
 
                     }
+                    else {
+                        if (newUserName.equals(memberUserName)) {
+                            Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
+                            intent.putExtra(USER_TO_DISPLAY, memberId);
+                            startActivity(intent);
+                            finish();
+                            addUserToDatabase(member);
+                            usersListRef.setValue(usersList);
+                        } else {
+                            Toast.makeText(RegisterActivity.this, "UserName is taken", Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
-                    Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
-                    intent.putExtra(USER_TO_DISPLAY, memberId);
-                    startActivity(intent);
-                    finish();
-                    addUserToDatabase(member);
-                    usersListRef.setValue(usersList);
 
                 } else {
+
                     Toast.makeText(RegisterActivity.this, "UserName can't be empty", Toast.LENGTH_SHORT).show();
                 }
             }
