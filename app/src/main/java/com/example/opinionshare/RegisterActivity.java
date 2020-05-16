@@ -60,7 +60,7 @@ public class RegisterActivity extends AppCompatActivity {
     private DatabaseReference usersRef;
     private DatabaseReference usersListRef;
     FirebaseAuth auth = FirebaseAuth.getInstance();
-    private StorageReference mStorageRef ;
+    private StorageReference mStorageRef;
     FirebaseUser user = auth.getCurrentUser();
     FirebaseUserMetadata metadata = user.getMetadata();
 
@@ -68,13 +68,11 @@ public class RegisterActivity extends AppCompatActivity {
     private DocumentReference mDocRef;
 
     // member details
-//    GenericTypeIndicator<List<String>> t = new GenericTypeIndicator<List<String>>() {};
     List<String> usersList = new ArrayList<>();
 
 
-
     String[] newUserToAdd;
-    boolean userexists=false;
+    boolean userexists = false;
     String memberProfilePhotoUri;
     String memberPhoneNumber;
     String memberUserName;
@@ -105,9 +103,7 @@ public class RegisterActivity extends AppCompatActivity {
         edit_text_email = findViewById(R.id.edit_text_email);
         continue_btn = findViewById(R.id.continue_btn);
         profileImage = findViewById(R.id.profileImage);
-        OldUserName=edit_text_username.getText().toString();
-
-
+        OldUserName = edit_text_username.getText().toString();
 
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -129,10 +125,8 @@ public class RegisterActivity extends AppCompatActivity {
             // TODO: create UI platform for adding more information about the new user
         } else {
             // This is an existing user get Member information from ds
-            userexists=true;
+            userexists = true;
         }
-
-
 
 
         continue_btn.setOnClickListener(new View.OnClickListener() {
@@ -203,11 +197,11 @@ public class RegisterActivity extends AppCompatActivity {
             Uri selectedImage = data.getData();
             profileImage.setImageURI(selectedImage);
             // TODO: photo needs to be downloaded and then stored in our database (Firestore ?) as file
-            StorageReference Imagename = mStorageRef.child("image"+selectedImage.getLastPathSegment());
+            StorageReference Imagename = mStorageRef.child("image" + selectedImage.getLastPathSegment());
             Imagename.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Toast.makeText(RegisterActivity.this,"Uploaded",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
                     Imagename.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
@@ -241,10 +235,6 @@ public class RegisterActivity extends AppCompatActivity {
                     memberProfilePhotoUri = member.getProfilePhotoUri();
                     memberUserName = member.getUsername();
 
-//
-//                    if (!memberUserName.equals("")) {
-//                        usersList.add(memberUserName);
-//                    }
                     edit_text_email.setText(memberEmail);
                     edit_text_fullname.setText(memberName);
                     edit_text_username.setText(memberUserName);
@@ -278,34 +268,9 @@ public class RegisterActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
 
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
-//
-//                        Object value = d.getValue();
-//                        UserToShow tD = new UserToShow();
-//                        if (value instanceof List) {
-//                            List<Object> t = (List<Object>) value;
-//                            tD.setId((String) t.get(0));
-//                            tD.setUsername((String) t.get(1));
-//                            // do your magic with values
-//                        } else {
-//                            // handle other possible types
-//                            HashMap<String, String> map = (HashMap<String, String>) value;
-//                            //Getting Collection of values from HashMap
-//                            Collection<String> values = map.values();
-//                            //Creating an ArrayList of values
-//                            ArrayList<String> listOfValues = new ArrayList<String>(values);
-//                            tD.setId(listOfValues.get(0));
-//                            tD.setUsername(listOfValues.get(1));
-//
-//                        }
-//                        memberName = tD.getUsername();
-                        memberName= (String) d.getValue();
+                        memberName = (String) d.getValue();
                         usersList.add(memberName);
                     }
-//                    memberUserName = member.getUsername();
-//                    edit_text_username.setText(memberUserName);
-//                    if (!memberUserName.equals("")) {
-//                        usersList.add(memberUserName);
-//                    }
                 } else {
                     // TODO: change else actions
                     Toast.makeText(RegisterActivity.this, "users list data does not exist", Toast.LENGTH_LONG).show();
@@ -325,5 +290,4 @@ public class RegisterActivity extends AppCompatActivity {
         String memberId = member.getUserId();
         usersRef.child(memberId).setValue(member);
     }
-
 }

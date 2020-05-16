@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +46,8 @@ public class HomeActivity extends AppCompatActivity {
 
     // Set UI Variables
     ListView postsListView;
+    LinearLayout uploadVideoLayout;
+    LinearLayout uploadPhotoLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,10 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         postsListView = findViewById(R.id.PostsListView);
+        uploadPhotoLayout = findViewById(R.id.);
+
+
+
         MyAdapter adapter = new MyAdapter(this, mTitle);
         postsListView.setAdapter(adapter);
 
@@ -99,6 +106,10 @@ public class HomeActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+
+
+
 
     }
 

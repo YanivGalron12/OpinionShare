@@ -133,9 +133,7 @@ public class ExploreActivity extends AppCompatActivity {
                 return false;
             }
         });
-
     }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -171,9 +169,7 @@ public class ExploreActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot d: dataSnapshot.getChildren()){
-                        UserToShow tD = d.getValue(UserToShow.class);
-                        userNamelist.add(tD.getUsername());
-                        userIdlist.add(tD.getId());
+                        userNamelist.add(d.getValue(String.class));
                     }
                 } else {
                     // TODO: change else actions
