@@ -1,12 +1,20 @@
 package com.example.opinionshare;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,7 +27,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class HomeActivity extends AppCompatActivity {
@@ -30,16 +40,20 @@ public class HomeActivity extends AppCompatActivity {
     String memberId;
     Member member;
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
-
+    ListView listView;
+    String mTitle[] = {"1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1"};
 
     // Set UI Variables
-    TextView username_textview;
+    ListView postsListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        postsListView = findViewById(R.id.PostsListView);
+        MyAdapter adapter = new MyAdapter(this, mTitle);
+        postsListView.setAdapter(adapter);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mRef = mFirebaseDatabase.getReference();
@@ -55,29 +69,29 @@ public class HomeActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.profile:
                         Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
-                        memberId=user.getUid();
+                        memberId = user.getUid();
                         intent.putExtra(USER_TO_DISPLAY, memberId);
                         startActivity(intent);
                         finish();
-                        overridePendingTransition(0,0);
+                        overridePendingTransition(0, 0);
                         return true;
                     case R.id.explore:
-                        startActivity(new Intent(getApplicationContext(),ExploreActivity.class));
+                        startActivity(new Intent(getApplicationContext(), ExploreActivity.class));
                         finish();
-                        overridePendingTransition(0,0);
+                        overridePendingTransition(0, 0);
                         return true;
                     case R.id.inbox:
                         startActivity(new Intent(getApplicationContext(), InboxActivity.class));
                         finish();
-                        overridePendingTransition(0,0);
+                        overridePendingTransition(0, 0);
                         return true;
                     case R.id.shop:
                         startActivity(new Intent(getApplicationContext(), ShopActivity.class));
                         finish();
-                        overridePendingTransition(0,0);
+                        overridePendingTransition(0, 0);
                         return true;
                     case R.id.home:
                         return true;
@@ -85,6 +99,35 @@ public class HomeActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+    }
+
+    class MyAdapter extends ArrayAdapter<String> {
+        Context context;
+        String rTitle[];
+
+        MyAdapter(Context c, String title[]) {
+            super(c, R.layout.post_display, R.id.PostOwnerNameTextView, title);
+            this.context = c;
+            this.rTitle = title;
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            LayoutInflater layoutInflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View post_display = layoutInflater.inflate(R.layout.post_display, parent, false);
+            CircleImageView postOwnerPhotoImageView = post_display.findViewById(R.id.PostOwnerPhotoImageView);
+            ProportionalImageView postImageImageView = post_display.findViewById(R.id.PostImageImageView);
+            TextView postOwnerNameTextView = post_display.findViewById(R.id.PostOwnerNameTextView);
+            TextView postCategoryTextView = post_display.findViewById(R.id.PostCategoryTextView);
+            TextView postRequestTextView = post_display.findViewById(R.id.PostRequestTextView);
+            TextView postDescriptionTextView = post_display.findViewById(R.id.PostDescriptionTextView);
+
+            // now set our resources
+            postOwnerNameTextView.setText(rTitle[position]);
+            return post_display;
+        }
 
     }
 

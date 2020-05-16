@@ -7,64 +7,61 @@
     tools:context=".HomeActivity">
 
 
-    <!--  <Button
-         android:id="@+id/upload_btn"
-         android:layout_width="wrap_content"
-         android:layout_below="@+id/postLayout"
-         android:layout_centerHorizontal="true"
-         android:layout_height="wrap_content"
-         android:text="UploadPost" />
- -->
-
-
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/ImageOrVidLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#f0ffa0"
-        android:scrollIndicators="right"
-        android:scrollbarStyle="insideOverlay"
-        android:scrollbars="vertical">
+        android:paddingTop="5dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/VideoOption"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/musicandmultimedia" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:text="Upload Video" />
+    </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
-            android:orientation="vertical">
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
-            <LinearLayout
-                android:id="@+id/ImageOrVidLayout"
+            <ImageView
+                android:id="@+id/ImageOption"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/toolsandutensils" />
+
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/VideoOption"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_gravity="end"
-                    android:layout_marginLeft="50dp"
-                    android:layout_marginRight="90dp"
-                    android:layout_weight="1"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/musicandmultimedia"
-                    />
-
-                <ImageView
-                    android:id="@+id/ImageOption"
-                    android:layout_marginRight="50dp"
-
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_gravity="start"
-                    android:layout_weight="1"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/toolsandutensils" />
-            </LinearLayout>
-
-
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Upload Photo" />
         </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/PostsLayout"
+        android:layout_below="@id/ImageOrVidLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    <ListView
+        android:id="@+id/PostsListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    </LinearLayout>
 
-    </ScrollView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"

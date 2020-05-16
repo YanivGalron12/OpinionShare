@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="16dp">
+
+    <LinearLayout
+        android:id="@+id/PostInformationLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="3dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/PostOwnerPhotoImageView"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/ic_boy" />
+
+            <TextView
+                android:id="@+id/PostOwnerNameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
+                android:gravity="center_vertical"
+                android:paddingStart="5dp"
+                android:text="Yaniv Galron"
+                android:textColor="#000"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/PostCategoryTextView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:gravity="center"
+                android:text="Kitchen"
+                android:textColor="#000"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/PostRequestTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Can you guys please help me?"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <com.example.opinionshare.ProportionalImageView
+            android:id="@+id/PostImageImageView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/PostInformationLayout"
+            android:adjustViewBounds="true"
+            android:paddingTop="16dp"
+            android:src="@drawable/ic_boy" />
+
+        <TextView
+            android:id="@+id/PostDescriptionTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="This is the description. here i wiil give you more details about my problem and hope you can solve it"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>
