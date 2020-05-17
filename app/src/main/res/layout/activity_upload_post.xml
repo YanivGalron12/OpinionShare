@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:paddingTop="16dp">
 
     <LinearLayout
+        android:layout_centerInParent="true"
         android:id="@+id/PostInformationLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -64,15 +65,6 @@
             android:adjustViewBounds="true"
             android:paddingTop="16dp"
             android:src="@drawable/ic_boy" />
-
-        <com.example.opinionshare.ProportionalVideoView
-            android:id="@+id/PostVideoVideoView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/PostInformationLayout"
-            android:adjustViewBounds="true"
-            android:paddingTop="16dp"
-            />
 
         <TextView
             android:id="@+id/PostDescriptionTextView"

@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -19,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,6 +30,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.w3c.dom.Text;
 
@@ -35,14 +40,17 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HomeActivity extends AppCompatActivity {
 
+    private static final int RESULT_LOAD_IMAGE = 1;
     private static final String TAG = "TAG";
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mRef;
+    int SELECT_VIDEO_REQUEST = 100;
     String memberId;
     Member member;
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     ListView listView;
     String mTitle[] = {"1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1"};
+    Boolean mIsVideo[] = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false};
 
     // Set UI Variables
     ListView postsListView;
@@ -55,11 +63,34 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         postsListView = findViewById(R.id.PostsListView);
-        uploadPhotoLayout = findViewById(R.id.);
+        uploadPhotoLayout = findViewById(R.id.UploadPhotoLayout);
+        uploadVideoLayout = findViewById(R.id.UploadVideoLayout);
+
+        uploadVideoLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Move to Upload Page and say to it that you want to upload Video
+//                Intent galleyIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Toast.makeText(HomeActivity.this, "Video Upload", Toast.LENGTH_SHORT).show();
+                selectVideoFromGallery();
+
+            }
+        });
+
+        uploadPhotoLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Move to Upload Page and say to it that you want to upload Photo
+                Toast.makeText(HomeActivity.this, "Photo Upload", Toast.LENGTH_SHORT).show();
+                Intent galleyIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(galleyIntent, RESULT_LOAD_IMAGE);
+
+//                Intent galleyIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            }
+        });
 
 
-
-        MyAdapter adapter = new MyAdapter(this, mTitle);
+        MyAdapter adapter = new MyAdapter(this, mTitle,mIsVideo);
         postsListView.setAdapter(adapter);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -108,19 +139,63 @@ public class HomeActivity extends AppCompatActivity {
         });
 
 
+    }
 
+    public void selectVideoFromGallery() {
+        Intent intent;
+        if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
+            intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        } else {
+            intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.INTERNAL_CONTENT_URI);
+        }
+        intent.setType("video/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.putExtra("return-data", true);
+        startActivityForResult(intent, SELECT_VIDEO_REQUEST);
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
+            Uri selectedImage = data.getData();
+//            profileImage.setImageURI(selectedImage);
+//            // TODO: photo needs to be downloaded and then stored in our database (Firestore ?) as file
+//            StorageReference Imagename = mStorageRef.child("image" + selectedImage.getLastPathSegment());
+//            Imagename.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                @Override
+//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                    Toast.makeText(RegisterActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
+//                    Imagename.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                        @Override
+//                        public void onSuccess(Uri uri) {
+//                            member.setProfilePhotoUri(uri.toString());
+//                            addUserToDatabase(member);
+//                        }
+//                    });
+//                }
+//            });
 
+        }
+        if (requestCode == SELECT_VIDEO_REQUEST && resultCode == RESULT_OK) {
+            if (data.getData() != null) {
+                Uri selectedVideoPath = data.getData();
+            } else {
+                Toast.makeText(getApplicationContext(), "Failed to select video", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     class MyAdapter extends ArrayAdapter<String> {
         Context context;
         String rTitle[];
+        Boolean rIsVideo[];
 
-        MyAdapter(Context c, String title[]) {
+        MyAdapter(Context c, String title[], Boolean isVideo[]) {
             super(c, R.layout.post_display, R.id.PostOwnerNameTextView, title);
             this.context = c;
             this.rTitle = title;
+            this.rIsVideo = isVideo;
         }
 
         @NonNull
@@ -130,6 +205,7 @@ public class HomeActivity extends AppCompatActivity {
             View post_display = layoutInflater.inflate(R.layout.post_display, parent, false);
             CircleImageView postOwnerPhotoImageView = post_display.findViewById(R.id.PostOwnerPhotoImageView);
             ProportionalImageView postImageImageView = post_display.findViewById(R.id.PostImageImageView);
+            ProportionalVideoView postVideoVideoView = post_display.findViewById(R.id.PostVideoVideoView);
             TextView postOwnerNameTextView = post_display.findViewById(R.id.PostOwnerNameTextView);
             TextView postCategoryTextView = post_display.findViewById(R.id.PostCategoryTextView);
             TextView postRequestTextView = post_display.findViewById(R.id.PostRequestTextView);
@@ -137,6 +213,13 @@ public class HomeActivity extends AppCompatActivity {
 
             // now set our resources
             postOwnerNameTextView.setText(rTitle[position]);
+            if (rIsVideo[position]) {
+                postVideoVideoView.setVisibility(View.VISIBLE);
+                postImageImageView.setVisibility(View.GONE);
+            } else {
+                postVideoVideoView.setVisibility(View.GONE);
+                postImageImageView.setVisibility(View.VISIBLE);
+            }
             return post_display;
         }
 
