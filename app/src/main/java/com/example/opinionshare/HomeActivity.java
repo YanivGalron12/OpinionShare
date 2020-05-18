@@ -42,6 +42,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final String TAG = "TAG";
+    private static final String POST_TYPE = "POST_TYPE";
+    private static final String URI_SELECTED = "URI_SELECTED";
+
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mRef;
     int SELECT_VIDEO_REQUEST = 100;
@@ -50,7 +53,7 @@ public class HomeActivity extends AppCompatActivity {
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     ListView listView;
     String mTitle[] = {"1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1"};
-    Boolean mIsVideo[] = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false};
+    Boolean mIsVideo[] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
     // Set UI Variables
     ListView postsListView;
@@ -73,7 +76,6 @@ public class HomeActivity extends AppCompatActivity {
 //                Intent galleyIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 Toast.makeText(HomeActivity.this, "Video Upload", Toast.LENGTH_SHORT).show();
                 selectVideoFromGallery();
-
             }
         });
 
@@ -90,7 +92,7 @@ public class HomeActivity extends AppCompatActivity {
         });
 
 
-        MyAdapter adapter = new MyAdapter(this, mTitle,mIsVideo);
+        MyAdapter adapter = new MyAdapter(this, mTitle, mIsVideo);
         postsListView.setAdapter(adapter);
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -159,30 +161,18 @@ public class HomeActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
             Uri selectedImage = data.getData();
-//            profileImage.setImageURI(selectedImage);
-//            // TODO: photo needs to be downloaded and then stored in our database (Firestore ?) as file
-//            StorageReference Imagename = mStorageRef.child("image" + selectedImage.getLastPathSegment());
-//            Imagename.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                @Override
-//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                    Toast.makeText(RegisterActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
-//                    Imagename.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                        @Override
-//                        public void onSuccess(Uri uri) {
-//                            member.setProfilePhotoUri(uri.toString());
-//                            addUserToDatabase(member);
-//                        }
-//                    });
-//                }
-//            });
+            Intent intent = new Intent(HomeActivity.this, UploadPostActivity.class);
+            intent.putExtra(POST_TYPE, "Image");
+            intent.putExtra(URI_SELECTED, selectedImage.toString());
+            startActivity(intent);
 
         }
-        if (requestCode == SELECT_VIDEO_REQUEST && resultCode == RESULT_OK) {
-            if (data.getData() != null) {
-                Uri selectedVideoPath = data.getData();
-            } else {
-                Toast.makeText(getApplicationContext(), "Failed to select video", Toast.LENGTH_LONG).show();
-            }
+        if (requestCode == SELECT_VIDEO_REQUEST && resultCode == RESULT_OK && data != null) {
+            Uri selectedVideoPath = data.getData();
+            Intent intent = new Intent(HomeActivity.this, UploadPostActivity.class);
+            intent.putExtra(POST_TYPE, "Video");
+            intent.putExtra(URI_SELECTED, selectedVideoPath.toString());
+            startActivity(intent);
         }
     }
 

@@ -5,12 +5,11 @@
     android:paddingTop="16dp">
 
     <LinearLayout
-        android:layout_centerInParent="true"
         android:id="@+id/PostInformationLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -36,24 +35,24 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/PostCategoryTextView"
+            <EditText
+                android:id="@+id/PostCategoryEditText"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="5"
-                android:gravity="center"
-                android:text="Kitchen"
+                android:gravity="center|bottom"
+                android:hint="Enter Category"
                 android:textColor="#000"
                 android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/PostRequestTextView"
+        <EditText
+            android:id="@+id/PostRequestEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Can you guys please help me?"
+            android:hint="Enter Question"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -66,12 +65,21 @@
             android:paddingTop="16dp"
             android:src="@drawable/ic_boy" />
 
-        <TextView
-            android:id="@+id/PostDescriptionTextView"
+        <com.example.opinionshare.ProportionalVideoView
+            android:id="@+id/PostVideoVideoView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/PostInformationLayout"
+            android:adjustViewBounds="true"
+            android:paddingTop="16dp"
+            />
+
+        <EditText
+            android:id="@+id/PostDescriptionEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="This is the description. here i wiil give you more details about my problem and hope you can solve it"
+            android:hint="Description"
             android:textSize="14sp"
             android:textStyle="bold" />
 

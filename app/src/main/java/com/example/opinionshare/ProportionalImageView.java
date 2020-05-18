@@ -8,7 +8,7 @@ import android.widget.ImageView;
 public class ProportionalImageView extends androidx.appcompat.widget.AppCompatImageView {
 
     public ProportionalImageView(Context context) {
-        super(context);
+        super(conqtext);
     }
 
     public ProportionalImageView(Context context, AttributeSet attrs) {
