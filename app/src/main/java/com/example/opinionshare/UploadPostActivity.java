@@ -5,9 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -23,6 +26,7 @@ public class UploadPostActivity extends AppCompatActivity {
     ProportionalImageView postImageImageView;
     ProportionalVideoView postVideoVideoView;
     String selectedContant, postType;
+    Button upload_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +45,24 @@ public class UploadPostActivity extends AppCompatActivity {
         postImageImageView = findViewById(R.id.PostImageImageView);
         postVideoVideoView = findViewById(R.id.PostVideoVideoView);
 
-        if (postType == "Video") {
+        upload_button = findViewById(R.id.upload_button);
+
+        upload_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: Add post to data base and
+                Toast.makeText(UploadPostActivity.this, postType + " Upload", Toast.LENGTH_SHORT).show();
+                if (postType.equals("Video")) {
+                    postVideoVideoView.start();
+                }
+            }
+        });
+
+        if (postType.equals("Video")) {
             postVideoVideoView.setVisibility(View.VISIBLE);
             postImageImageView.setVisibility(View.GONE);
-            postVideoVideoView.setVideoPath(selectedContant);
+            postVideoVideoView.setVideoURI(Uri.parse(selectedContant));
+//            postVideoVideoView.setVideoPath(selectedContant);
         } else {
             postVideoVideoView.setVisibility(View.GONE);
             postImageImageView.setVisibility(View.VISIBLE);

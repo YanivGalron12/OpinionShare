@@ -74,7 +74,6 @@ public class HomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //Move to Upload Page and say to it that you want to upload Video
 //                Intent galleyIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                Toast.makeText(HomeActivity.this, "Video Upload", Toast.LENGTH_SHORT).show();
                 selectVideoFromGallery();
             }
         });
