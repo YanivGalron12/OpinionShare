@@ -45,5 +45,6 @@ public class ProportionalVideoView extends VideoView {
         }
         setMeasuredDimension(width, height);
     }
+
 }
 

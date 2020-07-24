@@ -25,7 +25,7 @@
                     android:id="@+id/PostOwnerPhotoImageView"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:background="@drawable/ic_boy" />
+                    />
 
                 <TextView
                     android:id="@+id/PostOwnerNameTextView"
@@ -34,7 +34,6 @@
                     android:layout_weight="4"
                     android:gravity="center_vertical"
                     android:paddingStart="5dp"
-                    android:text="Yaniv Galron"
                     android:textColor="#000"
                     android:textSize="16sp"
                     android:textStyle="bold" />

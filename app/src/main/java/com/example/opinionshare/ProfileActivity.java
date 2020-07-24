@@ -68,7 +68,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     // add Firebase Database stuff
     FirebaseAuth auth = FirebaseAuth.getInstance();
-    FirebaseUserMetadata metadata;
     FirebaseUser user;
 
     private FirebaseDatabase mFirebaseDatabase;
