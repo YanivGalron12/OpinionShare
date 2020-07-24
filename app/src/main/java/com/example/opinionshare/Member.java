@@ -31,7 +31,7 @@ public class Member {
         this.profilePhotoUri = profilePhotoUri;
         this.age = 1000;
         this.likeCounter = 0;
-        this.friendList = friendList;// TODO: add friendList to constructor
+        this.friendList = new ArrayList<String>();// TODO: add friendList to constructor
         this.categoryList = new ArrayList<String>();
         this.PostList = new ArrayList<Posts>();
 
