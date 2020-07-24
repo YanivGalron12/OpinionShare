@@ -133,9 +133,7 @@ public class ExploreActivity extends AppCompatActivity {
                 return false;
             }
         });
-
     }
-
     @Override
     protected void onStart() {
         super.onStart();

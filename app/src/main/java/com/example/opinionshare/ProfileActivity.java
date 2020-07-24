@@ -68,7 +68,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     // add Firebase Database stuff
     FirebaseAuth auth = FirebaseAuth.getInstance();
-    FirebaseUserMetadata metadata;
     FirebaseUser user;
 
     private FirebaseDatabase mFirebaseDatabase;
@@ -79,17 +78,6 @@ public class ProfileActivity extends AppCompatActivity {
     Member member = new Member();
     ArrayList<String> friendList = new ArrayList<>();
 
-//    // TODO: put this onBackPressed function on the main activity of the app
-//    // TODO: take care of back button bug on other activities -
-//    @Override
-//    public void onBackPressed() {
-//        super.onBackPressed();
-//        Intent homeIntent = new Intent(Intent.ACTION_MAIN);
-//        homeIntent.addCategory( Intent.CATEGORY_HOME );
-//        homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        startActivity(homeIntent);
-//        return;
-//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

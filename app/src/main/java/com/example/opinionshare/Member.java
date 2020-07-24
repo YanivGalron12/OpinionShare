@@ -15,6 +15,7 @@ public class Member {
     private Integer age, likeCounter;
     private ArrayList<String> friendList;
     private ArrayList<String> categoryList;
+    private ArrayList<Posts> PostList;
 
     public Member() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -32,6 +33,7 @@ public class Member {
         this.likeCounter = 0;
         this.friendList = friendList;// TODO: add friendList to constructor
         this.categoryList = new ArrayList<String>();
+        this.PostList = new ArrayList<Posts>();
 
     }
 
@@ -122,4 +124,13 @@ public class Member {
     public void setCategoryList(List<String> categoryList) {
         this.categoryList = (ArrayList<String>) categoryList;
     }
+
+    public List<Posts> getPostList() {
+        return PostList;
+    }
+
+    public void setPostList(List<Posts> PostList) {
+        this.PostList = (ArrayList<Posts>) PostList;
+    }
+
 }

@@ -61,6 +61,7 @@ public class RegisterActivity extends AppCompatActivity {
     private DatabaseReference usersMapRef;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     private StorageReference mStorageRef ;
+    private StorageReference mStorageRef;
     FirebaseUser user = auth.getCurrentUser();
     FirebaseUserMetadata metadata = user.getMetadata();
 
@@ -105,7 +106,6 @@ public class RegisterActivity extends AppCompatActivity {
         edit_text_email = findViewById(R.id.edit_text_email);
         continue_btn = findViewById(R.id.continue_btn);
         profileImage = findViewById(R.id.profileImage);
-        OldUserName=edit_text_username.getText().toString();
 
 
 
@@ -129,7 +129,6 @@ public class RegisterActivity extends AppCompatActivity {
             // TODO: create UI platform for adding more information about the new user
         } else {
             // This is an existing user get Member information from ds
-            userexists=true;
         }
 
 
@@ -217,11 +216,11 @@ public class RegisterActivity extends AppCompatActivity {
             Uri selectedImage = data.getData();
             profileImage.setImageURI(selectedImage);
             // TODO: photo needs to be downloaded and then stored in our database (Firestore ?) as file
-            StorageReference Imagename = mStorageRef.child("image"+selectedImage.getLastPathSegment());
             Imagename.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     Toast.makeText(RegisterActivity.this,"Uploaded",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
                     Imagename.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
@@ -315,6 +314,8 @@ public class RegisterActivity extends AppCompatActivity {
                         usersMap.put((String)d.getKey(),(String)d.getValue());
 
 
+                        memberName = (String) d.getValue();
+                        usersList.add(memberName);
                     }
 //                    memberUserName = member.getUsername();
 //                    edit_text_username.setText(memberUserName);
