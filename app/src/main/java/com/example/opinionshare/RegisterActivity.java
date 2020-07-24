@@ -52,7 +52,7 @@ public class RegisterActivity extends AppCompatActivity {
     // add Firebase Database stuff
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference usersRef;
-    private DatabaseReference usersListRef;
+    private DatabaseReference usersMapRef;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseUser user = auth.getCurrentUser();
@@ -63,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     // member details
 //    GenericTypeIndicator<List<String>> t = new GenericTypeIndicator<List<String>>() {};
-    List<String> usersList = new ArrayList<>();
+    HashMap<String,String> usersMap = new HashMap<>();
 
 
 
@@ -103,7 +103,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         usersRef = mFirebaseDatabase.getReference().child("users");
-        usersListRef = mFirebaseDatabase.getReference().child("usersList");
+        usersMapRef = mFirebaseDatabase.getReference().child("usersMap");
         memberId = user.getUid();
 
         /**need to add the isTaskRoot() because otherwise the app will think this is a new user
@@ -128,19 +128,19 @@ public class RegisterActivity extends AppCompatActivity {
                 member.setName(edit_text_fullname.getText().toString());
                 newUserName = edit_text_username.getText().toString();
                 if (!newUserName.equals("")) {
-                    if (!newUserName.equals(memberUserName)&&!usersList.contains(newUserName)) {
+                    if (!newUserName.equals(memberUserName)&&!usersMap.containsValue(newUserName)) {
 //                        String[] oldUserToRemove = new String[]{memberUserName,memberId};
-                        usersList.remove(memberUserName);
+                       usersMap.remove(memberId,memberUserName);
+                       usersMap.put(memberId,newUserName);
                         member.setUsername(newUserName);
                         memberUserName = member.getUsername();
                         Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
-                        usersList.add(memberUserName);
                         Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
                         intent.putExtra(USER_TO_DISPLAY, memberId);
                         startActivity(intent);
                         finish();
                         addUserToDatabase(member);
-                        usersListRef.setValue(usersList);
+                        usersMapRef.setValue(usersMap);
 
 
 //                        friendslist.add(newUserToAdd.getUsername());
@@ -153,7 +153,7 @@ public class RegisterActivity extends AppCompatActivity {
                             startActivity(intent);
                             finish();
                             addUserToDatabase(member);
-                            usersListRef.setValue(usersList);
+                            usersMapRef.setValue(usersMap);
                         } else {
                             Toast.makeText(RegisterActivity.this, "UserName is taken", Toast.LENGTH_SHORT).show();
                         }
@@ -271,7 +271,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        usersListRef.addValueEventListener(new ValueEventListener() {
+        usersMapRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -300,9 +300,10 @@ public class RegisterActivity extends AppCompatActivity {
 //                            tD.setUsername(listOfValues.get(1));
 //
 //                        }
-//                        memberName = tD.getUsername();
-                        memberName= (String) d.getValue();
-                        usersList.add(memberName);
+//
+                        usersMap.put((String)d.getKey(),(String)d.getValue());
+
+
                     }
 //                    memberUserName = member.getUsername();
 //                    edit_text_username.setText(memberUserName);

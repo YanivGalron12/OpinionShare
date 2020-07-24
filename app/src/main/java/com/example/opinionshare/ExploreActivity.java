@@ -33,7 +33,7 @@ public class ExploreActivity extends AppCompatActivity {
     private static final String TAG = "TAG";
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference usersRef;
-    private DatabaseReference usersListRef;
+    private DatabaseReference usersMapRef;
     String memberId;
     Member member;
 
@@ -54,7 +54,7 @@ public class ExploreActivity extends AppCompatActivity {
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         usersRef = mFirebaseDatabase.getReference().child("users");
-        usersListRef = mFirebaseDatabase.getReference().child("usersList");
+        usersMapRef = mFirebaseDatabase.getReference().child("usersMap");
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();
@@ -162,7 +162,7 @@ public class ExploreActivity extends AppCompatActivity {
             }
         });
 
-        usersListRef.addValueEventListener(new ValueEventListener() {
+        usersMapRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -171,9 +171,8 @@ public class ExploreActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot d: dataSnapshot.getChildren()){
-                        UserToShow tD = d.getValue(UserToShow.class);
-                        userNamelist.add(tD.getUsername());
-                        userIdlist.add(tD.getId());
+                     userNamelist.add((String)d.getValue());
+                     userIdlist.add((String)d.getKey());
                     }
                 } else {
                     // TODO: change else actions
