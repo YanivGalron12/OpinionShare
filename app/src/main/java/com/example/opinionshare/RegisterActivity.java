@@ -68,13 +68,8 @@ public class RegisterActivity extends AppCompatActivity {
     private DocumentReference mDocRef;
 
     // member details
-<<<<<<< HEAD
 //    GenericTypeIndicator<List<String>> t = new GenericTypeIndicator<List<String>>() {};
     HashMap<String,String> usersMap = new HashMap<>();
-=======
-    List<String> usersList = new ArrayList<>();
->>>>>>> posts
-
 
     String[] newUserToAdd;
     boolean userexists = false;
@@ -287,7 +282,6 @@ public class RegisterActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
 
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
-<<<<<<< HEAD
 //
 //                        Object value = d.getValue();
 //                        UserToShow tD = new UserToShow();
@@ -309,12 +303,6 @@ public class RegisterActivity extends AppCompatActivity {
 //                        }
 //
                         usersMap.put((String)d.getKey(),(String)d.getValue());
-
-
-=======
-                        memberName = (String) d.getValue();
-                        usersList.add(memberName);
->>>>>>> posts
                     }
                 } else {
                     // TODO: change else actions
