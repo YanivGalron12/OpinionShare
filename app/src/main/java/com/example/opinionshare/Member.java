@@ -129,6 +129,10 @@ public class Member {
         return PostList;
     }
 
+    public Posts getPostByPosition(int position){
+        return PostList.get(position);
+    }
+
     public void setPostList(List<Posts> PostList) {
         this.PostList = (ArrayList<Posts>) PostList;
     }

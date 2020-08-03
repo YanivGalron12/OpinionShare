@@ -26,6 +26,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -48,6 +50,8 @@ public class UploadPostActivity extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference usersRef;
     Member member = new Member();
+    Posts post = new Posts();
+    List<Posts> PostList = new ArrayList<Posts>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,30 +83,36 @@ public class UploadPostActivity extends AppCompatActivity {
                     postVideoVideoView.start();
                 }
             }
-
         });
         upload_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO: Add post to data base and
                 Toast.makeText(UploadPostActivity.this, postType + " Upload", Toast.LENGTH_SHORT).show();
-//                postCategoryEditText ;
-//                postRequestEditText;
-//                postDescriptionEditText;
-//                memberId;
-                if (postType.equals("Video")) {
-//                    postVideoVideoView.setVideoURI(Uri.parse(selectedContant));
-                }else{
-//                    Picasso.get().load(selectedContant).into(postImageImageView);
+
+                post.setCreationDate(java.time.LocalDate.now().toString());
+                post.setPostType(postType);
+                post.setPostUri(Uri.parse(selectedContant).toString());//TODO: change link to be the link to the storage and not internal location
+                post.setLikeCounter(0);
+                post.setCaption(postCategoryEditText.getText().toString());
+                post.setDescription(postDescriptionEditText.getText().toString());
+                post.setCategory(postCategoryEditText.getText().toString());
+                if (member.getPostList()!=null) {
+                    PostList  = member.getPostList();
                 }
+                PostList.add(post);
+                member.setPostList(PostList);
+                addPostToDatabase(member);
+                startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+
+
             }
         });
 
         if (postType.equals("Video")) {
             postVideoVideoView.setVisibility(View.VISIBLE);
             postImageImageView.setVisibility(View.GONE);
-            postVideoVideoView.setVideoURI(Uri.parse(selectedContant));
-//            postVideoVideoView.setVideoPath(selectedContant);
+            postVideoVideoView.setVideoURI(Uri.parse("https://firebasestorage.googleapis.com/v0/b/opinionshare-1585847822926.appspot.com/o/MembersPosts%2Fpostvideo%3A252331?alt=media&token=2175d003-5ddd-452e-b2ae-ae24f0857348"));
         } else {
             postVideoVideoView.setVisibility(View.GONE);
             postImageImageView.setVisibility(View.VISIBLE);
@@ -134,5 +144,8 @@ public class UploadPostActivity extends AppCompatActivity {
             }
         });
     }
-
+    private void addPostToDatabase(Member member) {
+        String memberId = member.getUserId();
+        usersRef.child(memberId).setValue(member);
+    }
 }

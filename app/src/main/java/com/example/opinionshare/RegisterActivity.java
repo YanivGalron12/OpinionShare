@@ -195,7 +195,6 @@ public class RegisterActivity extends AppCompatActivity {
             memberProfilePhotoUri = "NoPhoto";
         }
         memberUserName = edit_text_username.getText().toString();
-//            friendslist.add(memberId);
         member = new Member(memberId, memberName, memberEmail, memberProfilePhotoUri, memberPhoneNumber, memberUserName);
         addUserToDatabase(member); // Add this member to RTDB (Real Time Database)
         // Display user details

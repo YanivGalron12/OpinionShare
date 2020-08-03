@@ -35,8 +35,52 @@
             android:textSize="50sp"
             android:textStyle="bold" />
 
-    </LinearLayout>
+        <Button
+            android:layout_marginTop="50dp"
+            android:id="@+id/signout_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign Out"
+            android:textAllCaps="false"
+            tools:ignore="HardcodedText" />
+        <Button
+            android:id="@+id/addfriend_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Friend"
+            android:textAllCaps="false"
+            tools:ignore="HardcodedText" />
 
+        <Button
+            android:id="@+id/info_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="info"
+            android:textAllCaps="false"
+            tools:ignore="HardcodedText" />
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/userpost_layout"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/userinformation_layout"
+        android:layout_height="500dp"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical">
+
+    <GridView
+        android:id="@+id/post_grid_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:columnWidth="90dp"
+        android:horizontalSpacing="10dp"
+        android:verticalSpacing="10dp"
+        android:gravity="center"
+        android:stretchMode="columnWidth"
+        android:numColumns="3"
+        />
+    </LinearLayout>
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profileImage"
@@ -50,39 +94,6 @@
         app:civ_border_color="#FF000000"
         app:civ_border_width="2dp" />
 
-    <Button
-        android:id="@+id/addfriend_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="266dp"
-        android:text="Add Friend"
-        android:textAllCaps="false" />
-
-
-
-    <Button
-        android:id="@+id/signout_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="62dp"
-        android:text="Sign Out"
-        android:textAllCaps="false"
-        tools:ignore="HardcodedText" />
-
-    <Button
-        android:id="@+id/info_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/signout_btn"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:text="info"
-        android:textAllCaps="false"
-        tools:ignore="HardcodedText" />
 
 
 </RelativeLayout>

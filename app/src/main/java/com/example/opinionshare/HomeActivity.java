@@ -30,6 +30,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -47,9 +48,12 @@ public class HomeActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mRef;
+    private StorageReference mStorageRef;
     int SELECT_VIDEO_REQUEST = 100;
     String memberId;
     Member member;
+    private Uri selectedImage;
+    private Uri selectedVideoPath;
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     ListView listView;
     String mTitle[] = {"1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1"};
@@ -64,7 +68,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
+        mStorageRef = FirebaseStorage.getInstance().getReference().child("MembersPosts");
         postsListView = findViewById(R.id.PostsListView);
         uploadPhotoLayout = findViewById(R.id.UploadPhotoLayout);
         uploadVideoLayout = findViewById(R.id.UploadVideoLayout);
@@ -73,7 +77,6 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //Move to Upload Page and say to it that you want to upload Video
-//                Intent galleyIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 selectVideoFromGallery();
             }
         });
@@ -82,11 +85,8 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //Move to Upload Page and say to it that you want to upload Photo
-                Toast.makeText(HomeActivity.this, "Photo Upload", Toast.LENGTH_SHORT).show();
                 Intent galleyIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(galleyIntent, RESULT_LOAD_IMAGE);
-
-//                Intent galleyIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             }
         });
 
@@ -138,8 +138,6 @@ public class HomeActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-
     }
 
     public void selectVideoFromGallery() {
@@ -159,19 +157,47 @@ public class HomeActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
-            Uri selectedImage = data.getData();
+            selectedImage = data.getData();
             Intent intent = new Intent(HomeActivity.this, UploadPostActivity.class);
-            intent.putExtra(POST_TYPE, "Image");
-            intent.putExtra(URI_SELECTED, selectedImage.toString());
-            startActivity(intent);
+            //444444
+            StorageReference postRef = mStorageRef.child("postRef" + selectedImage.getLastPathSegment());
+            postRef.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    postRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            selectedImage = uri;
+                            Toast.makeText(HomeActivity.this, "HappyPhotoUploaded", Toast.LENGTH_LONG).show();
+                            intent.putExtra(POST_TYPE, "Image");
+                            intent.putExtra(URI_SELECTED, selectedImage.toString());
+                            startActivity(intent);
+                        }
 
+                    });
+                }
+            });
         }
         if (requestCode == SELECT_VIDEO_REQUEST && resultCode == RESULT_OK && data != null) {
-            Uri selectedVideoPath = data.getData();
+            selectedVideoPath = data.getData();
             Intent intent = new Intent(HomeActivity.this, UploadPostActivity.class);
-            intent.putExtra(POST_TYPE, "Video");
-            intent.putExtra(URI_SELECTED, selectedVideoPath.toString());
-            startActivity(intent);
+            //4444444
+            StorageReference postRef = mStorageRef.child("post" + selectedVideoPath.getLastPathSegment());
+            postRef.putFile(selectedVideoPath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    postRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            selectedVideoPath = uri;
+                            Toast.makeText(HomeActivity.this, "Happy", Toast.LENGTH_LONG).show();
+                            intent.putExtra(POST_TYPE, "Video");
+                            intent.putExtra(URI_SELECTED, selectedVideoPath.toString());
+                            startActivity(intent);
+                        }
+                    });
+                }
+            });
         }
     }
 
@@ -196,9 +222,9 @@ public class HomeActivity extends AppCompatActivity {
             ProportionalImageView postImageImageView = post_display.findViewById(R.id.PostImageImageView);
             ProportionalVideoView postVideoVideoView = post_display.findViewById(R.id.PostVideoVideoView);
             TextView postOwnerNameTextView = post_display.findViewById(R.id.PostOwnerNameTextView);
-            TextView postCategoryTextView = post_display.findViewById(R.id.PostCategoryTextView);
-            TextView postRequestTextView = post_display.findViewById(R.id.PostRequestTextView);
-            TextView postDescriptionTextView = post_display.findViewById(R.id.PostDescriptionTextView);
+            TextView postCategoryTextView = post_display.findViewById(R.id.PostCategoryTextView1);
+            TextView postRequestTextView = post_display.findViewById(R.id.PostRequestTextView1);
+            TextView postDescriptionTextView = post_display.findViewById(R.id.PostDescriptionTextView1);
 
             // now set our resources
             postOwnerNameTextView.setText(rTitle[position]);

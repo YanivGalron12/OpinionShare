@@ -13,8 +13,10 @@ import android.text.Editable;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -52,17 +54,17 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileActivity extends AppCompatActivity {
 
-
+    private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
+    private static final String POST_LOCATION = "POST_LOCATION";
     private static final String TAG = "AddToDatabase";
     private FirebaseAuth mAuth;
 
 
     // UI Objects
-    TextView username_textview;
-    TextView text;
-    Button signout_btn;
-    Button info_btn;
-    Button addfriend_btn;
+    TextView username_textview, text;
+    Button signout_btn, info_btn, addfriend_btn;
+    GridView postGridView;
+
 
     CircleImageView profileImage;
 
@@ -94,6 +96,21 @@ public class ProfileActivity extends AppCompatActivity {
         text = findViewById(R.id.text);
         profileImage = findViewById(R.id.profileImage);
         username_textview = findViewById(R.id.username_textview);
+        postGridView = findViewById(R.id.post_grid_view);
+
+        postGridView.setAdapter(new PostAdapter(this));
+
+
+        postGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // go to PostDisplay activity and pass to that activity which user is currently looked on and which post to show
+                Intent intent = new Intent(ProfileActivity.this,PostDisplay.class);
+                intent.putExtra(USER_TO_DISPLAY,userToDisplay_ID);
+                intent.putExtra(POST_LOCATION, String.valueOf(position));
+                startActivity(intent);
+            }
+        });
 
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
