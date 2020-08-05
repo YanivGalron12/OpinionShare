@@ -207,7 +207,7 @@ public class HomeActivity extends AppCompatActivity {
         Boolean rIsVideo[];
 
         MyAdapter(Context c, String title[], Boolean isVideo[]) {
-            super(c, R.layout.post_display, R.id.PostOwnerNameTextView, title);
+            super(c, R.layout.post_display, R.id.PostOwnerNameTextView1, title);
             this.context = c;
             this.rTitle = title;
             this.rIsVideo = isVideo;
@@ -218,10 +218,10 @@ public class HomeActivity extends AppCompatActivity {
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             LayoutInflater layoutInflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View post_display = layoutInflater.inflate(R.layout.post_display, parent, false);
-            CircleImageView postOwnerPhotoImageView = post_display.findViewById(R.id.PostOwnerPhotoImageView);
-            ProportionalImageView postImageImageView = post_display.findViewById(R.id.PostImageImageView);
-            ProportionalVideoView postVideoVideoView = post_display.findViewById(R.id.PostVideoVideoView);
-            TextView postOwnerNameTextView = post_display.findViewById(R.id.PostOwnerNameTextView);
+            CircleImageView postOwnerPhotoImageView = post_display.findViewById(R.id.PostOwnerPhotoImageView1);
+            ProportionalImageView postImageImageView = post_display.findViewById(R.id.PostImageImageView1);
+            ProportionalVideoView postVideoVideoView = post_display.findViewById(R.id.PostVideoVideoView1);
+            TextView postOwnerNameTextView = post_display.findViewById(R.id.PostOwnerNameTextView1);
             TextView postCategoryTextView = post_display.findViewById(R.id.PostCategoryTextView1);
             TextView postRequestTextView = post_display.findViewById(R.id.PostRequestTextView1);
             TextView postDescriptionTextView = post_display.findViewById(R.id.PostDescriptionTextView1);
