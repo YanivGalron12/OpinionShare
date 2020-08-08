@@ -55,11 +55,10 @@
             android:text="Can you guys please help me?"
             android:textSize="14sp"
             android:textStyle="bold" />
-
         <com.example.opinionshare.ProportionalImageView
             android:id="@+id/PostImageImageView1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="400dp"
             android:layout_below="@+id/PostInformationLayout"
             android:adjustViewBounds="true"
             android:paddingTop="16dp"
@@ -68,7 +67,7 @@
         <com.example.opinionshare.ProportionalVideoView
             android:id="@+id/PostVideoVideoView1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="400dp"
             android:layout_below="@+id/PostInformationLayout"
             android:adjustViewBounds="true"
             android:paddingTop="16dp"

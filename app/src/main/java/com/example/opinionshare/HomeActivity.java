@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,9 +32,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
+import bolts.Bolts;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
@@ -56,8 +61,6 @@ public class HomeActivity extends AppCompatActivity {
     private Uri selectedVideoPath;
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     ListView listView;
-    String mTitle[] = {"1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1"};
-    Boolean mIsVideo[] = {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false};
 
     // Set UI Variables
     ListView postsListView;
@@ -90,6 +93,19 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        ArrayList<FriendsPost> allPostFromLast20Days = getAllFriendsPostFromLast20Days(member);
+        String mTitle[] =new String[allPostFromLast20Days.size()];
+        Boolean mIsVideo[] =new Boolean[allPostFromLast20Days.size()];
+        String friend_to_post_list[] = new String[allPostFromLast20Days.size()];
+        int i = 0;
+        for (FriendsPost friendsPost: allPostFromLast20Days){
+            Toast.makeText(HomeActivity.this,"3",Toast.LENGTH_SHORT);
+
+            mTitle[i] = friendsPost.getMtitle();
+            mIsVideo[i] = friendsPost.getIsvideo();
+            friend_to_post_list[i] = friendsPost.getFriendID();
+            i=i+1;
+        }
 
         MyAdapter adapter = new MyAdapter(this, mTitle, mIsVideo);
         postsListView.setAdapter(adapter);
@@ -151,6 +167,68 @@ public class HomeActivity extends AppCompatActivity {
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.putExtra("return-data", true);
         startActivityForResult(intent, SELECT_VIDEO_REQUEST);
+    }
+    public  ArrayList<FriendsPost> getAllFriendsPostFromLast20Days(Member member){
+
+        ArrayList<FriendsPost> allPostFromLast20Days = new ArrayList<>();
+        try {
+            ArrayList<String> FriendsID = (ArrayList<String>) member.getFriendList();
+
+            for (String friendID : FriendsID){
+                allPostFromLast20Days.addAll(getPostFromLast20Days(friendID));
+            }
+        }catch (Exception e) {
+            Toast.makeText(HomeActivity.this,e.toString(),Toast.LENGTH_SHORT);
+            return allPostFromLast20Days;
+        }
+
+        return allPostFromLast20Days;
+    }
+
+    public ArrayList<FriendsPost> getPostFromLast20Days(String friendID){
+
+        ArrayList<FriendsPost> allPostFromLast20Days = new ArrayList<>();
+
+        DatabaseReference postRef = mFirebaseDatabase.getReference().child("users").child(friendID);
+        postRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this Location is updated
+                Log.d(TAG, "onDataChange: Added information to database: \n" +
+                        dataSnapshot.getValue());
+                Toast.makeText(HomeActivity.this,"1",Toast.LENGTH_LONG);
+
+                if (dataSnapshot.exists()) {
+                    Toast.makeText(HomeActivity.this,"2",Toast.LENGTH_LONG);
+
+                    Member friend = dataSnapshot.getValue(Member.class);
+                    Posts post = dataSnapshot.child("postList").getValue(Posts.class);
+                    LocalDate creationDate = LocalDate.parse(post.getCreationDate());
+                    LocalDate cutoffDate = LocalDate.now().minusDays(20);
+                    if(creationDate.isAfter(cutoffDate)){
+                        FriendsPost friendsPost = new FriendsPost();
+                        friendsPost.setPost(post);
+                        friendsPost.setIsvideo(post.getPostType().equals("Video"));
+                        friendsPost.setMtitle(friend.getUsername());
+                        friendsPost.setFriendID(friendID);
+                        allPostFromLast20Days.add(friendsPost);
+                    }
+                } else {
+                    // TODO: change else actions
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", databaseError.toException());
+            }
+        });
+
+
+
+        return allPostFromLast20Days;
     }
 
     @Override
@@ -266,4 +344,5 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
+
 }
