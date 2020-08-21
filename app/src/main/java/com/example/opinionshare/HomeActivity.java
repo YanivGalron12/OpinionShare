@@ -76,7 +76,7 @@ public class HomeActivity extends AppCompatActivity {
         postsListView = findViewById(R.id.PostsListView);
         uploadPhotoLayout = findViewById(R.id.UploadPhotoLayout);
         uploadVideoLayout = findViewById(R.id.UploadVideoLayout);
-
+        uploadVideoLayout.setVisibility(View.GONE);
         uploadVideoLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,19 +94,19 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        ArrayList<FriendsPost> allPostFromLast20Days = getAllFriendsPostFromLast20Days(member);
-        String mTitle[] =new String[allPostFromLast20Days.size()];
-        Boolean mIsVideo[] =new Boolean[allPostFromLast20Days.size()];
-        String friend_to_post_list[] = new String[allPostFromLast20Days.size()];
-        int i = 0;
-        for (FriendsPost friendsPost: allPostFromLast20Days){
-            Toast.makeText(HomeActivity.this,"3",Toast.LENGTH_SHORT);
-
-            mTitle[i] = friendsPost.getMtitle();
-            mIsVideo[i] = friendsPost.getIsvideo();
-            friend_to_post_list[i] = friendsPost.getFriendID();
-            i=i+1;
-        }
+//        ArrayList<FriendsPost> allPostFromLast20Days = getAllFriendsPostFromLast20Days(member);
+//        String mTitle[] =new String[allPostFromLast20Days.size()];
+//        Boolean mIsVideo[] =new Boolean[allPostFromLast20Days.size()];
+//        String friend_to_post_list[] = new String[allPostFromLast20Days.size()];
+//        int i = 0;
+//        for (FriendsPost friendsPost: allPostFromLast20Days){
+//            Toast.makeText(HomeActivity.this,"3",Toast.LENGTH_SHORT);
+//
+//            mTitle[i] = friendsPost.getMtitle();
+//            mIsVideo[i] = friendsPost.getIsvideo();
+//            friend_to_post_list[i] = friendsPost.getFriendID();
+//            i=i+1;
+//        }
 
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -123,7 +123,7 @@ public class HomeActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    switch (item.getItemId()) {
+                switch (item.getItemId()) {
                     case R.id.profile:
                         Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
                         memberId = user.getUid();
@@ -167,24 +167,25 @@ public class HomeActivity extends AppCompatActivity {
         intent.putExtra("return-data", true);
         startActivityForResult(intent, SELECT_VIDEO_REQUEST);
     }
-    public  ArrayList<FriendsPost> getAllFriendsPostFromLast20Days(Member member){
+
+    public ArrayList<FriendsPost> getAllFriendsPostFromLast20Days(Member member) {
 
         ArrayList<FriendsPost> allPostFromLast20Days = new ArrayList<>();
         try {
             ArrayList<String> FriendsID = (ArrayList<String>) member.getFriendList();
 
-            for (String friendID : FriendsID){
+            for (String friendID : FriendsID) {
                 allPostFromLast20Days.addAll(getPostFromLast20Days(friendID));
             }
-        }catch (Exception e) {
-            Toast.makeText(HomeActivity.this,e.toString(),Toast.LENGTH_SHORT);
+        } catch (Exception e) {
+            Toast.makeText(HomeActivity.this, e.toString(), Toast.LENGTH_SHORT);
             return allPostFromLast20Days;
         }
 
         return allPostFromLast20Days;
     }
 
-    public ArrayList<FriendsPost> getPostFromLast20Days(String friendID){
+    public ArrayList<FriendsPost> getPostFromLast20Days(String friendID) {
 
         ArrayList<FriendsPost> allPostFromLast20Days = new ArrayList<>();
 
@@ -196,29 +197,35 @@ public class HomeActivity extends AppCompatActivity {
                 // whenever data at this Location is updated
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
-                Toast.makeText(HomeActivity.this,"1",Toast.LENGTH_LONG);
+                Toast.makeText(HomeActivity.this, "1", Toast.LENGTH_LONG);
 
                 if (dataSnapshot.exists()) {
-                    Toast.makeText(HomeActivity.this,"2",Toast.LENGTH_LONG);
+                    Toast.makeText(HomeActivity.this, "2", Toast.LENGTH_LONG);
 
                     Member friend = dataSnapshot.getValue(Member.class);
-                    ArrayList<Posts> friend_post_list = (ArrayList<Posts>) friend.getPostList();
-                    for (int i =0; i<friend_post_list.size();i++)
-                    {
-                        Posts post=friend_post_list.get(i);
+                    int size = 0;
+                    ArrayList<Posts> friend_post_list = new ArrayList<Posts>();
+                    try {
+                        friend_post_list = (ArrayList<Posts>) friend.getPostList();
+                    } catch (Exception e) {
+                    }
+                    size = friend_post_list.size();
+
+                    for (int i = 0; i < size; i++) {
+                        Posts post = friend_post_list.get(i);
                         LocalDate creationDate = LocalDate.parse(post.getCreationDate());
                         LocalDate cutoffDate = LocalDate.now().minusDays(20);
-                        if(creationDate.isAfter(cutoffDate)) {
+                        if (creationDate.isAfter(cutoffDate)) {
                             FriendsPost friendsPost = new FriendsPost();
                             friendsPost.setPost(post);
                             friendsPost.setIsvideo(post.getPostType().equals("Video"));
                             friendsPost.setMtitle(friend.getUsername());
                             friendsPost.setFriendID(friendID);
                             allPostFromLast20Days.add(friendsPost);
-                            int x = 5 ;
+                            int x = 5;
                         }
                     }
-                    Toast.makeText(HomeActivity.this, "there are "+allPostFromLast20Days.size()+" posts", Toast.LENGTH_LONG).show();
+                    Toast.makeText(HomeActivity.this, "there are " + allPostFromLast20Days.size() + " posts", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(HomeActivity.this, "no posts recognized", Toast.LENGTH_LONG).show();
                 }
@@ -231,7 +238,6 @@ public class HomeActivity extends AppCompatActivity {
                 Log.w(TAG, "Failed to read value.", databaseError.toException());
             }
         });
-
 
 
         return allPostFromLast20Days;
@@ -336,19 +342,19 @@ public class HomeActivity extends AppCompatActivity {
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
-                    member  = dataSnapshot.child("users").child(memberId).getValue(Member.class);
+                    member = dataSnapshot.child("users").child(memberId).getValue(Member.class);
                     ArrayList<FriendsPost> allPostFromLast20Days = getAllFriendsPostFromLast20Days(member);
-                    String mTitle[] =new String[allPostFromLast20Days.size()];
-                    Boolean mIsVideo[] =new Boolean[allPostFromLast20Days.size()];
+                    String mTitle[] = new String[allPostFromLast20Days.size()];
+                    Boolean mIsVideo[] = new Boolean[allPostFromLast20Days.size()];
                     String friend_to_post_list[] = new String[allPostFromLast20Days.size()];
                     int i = 0;
-                    for (FriendsPost friendsPost: allPostFromLast20Days){
-                        Toast.makeText(HomeActivity.this,"3",Toast.LENGTH_SHORT);
+                    for (FriendsPost friendsPost : allPostFromLast20Days) {
+                        Toast.makeText(HomeActivity.this, "3", Toast.LENGTH_SHORT);
 
                         mTitle[i] = friendsPost.getMtitle();
                         mIsVideo[i] = friendsPost.getIsvideo();
                         friend_to_post_list[i] = friendsPost.getFriendID();
-                        i=i+1;
+                        i = i + 1;
                     }
 
                     MyAdapter adapter = new MyAdapter(HomeActivity.this, mTitle, mIsVideo);
