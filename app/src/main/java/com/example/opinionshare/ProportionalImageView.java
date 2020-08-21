@@ -28,4 +28,5 @@ public class ProportionalImageView extends androidx.appcompat.widget.AppCompatIm
             setMeasuredDimension(w, h);
         } else super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
+
 }

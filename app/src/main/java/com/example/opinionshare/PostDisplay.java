@@ -72,6 +72,16 @@ public class PostDisplay extends AppCompatActivity {
         postImageImageView = findViewById(R.id.PostImageImageView1);
         postVideoVideoView = findViewById(R.id.PostVideoVideoView1);
 
+        postVideoVideoView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if (postVideoVideoView.isPlaying()){
+                    postVideoVideoView.pause();
+                } else {
+                    postVideoVideoView.start();
+                }
+            }
+        });
 
         user = auth.getCurrentUser();
         mFirebaseDatabase = FirebaseDatabase.getInstance();

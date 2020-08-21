@@ -112,7 +112,7 @@ public class UploadPostActivity extends AppCompatActivity {
         if (postType.equals("Video")) {
             postVideoVideoView.setVisibility(View.VISIBLE);
             postImageImageView.setVisibility(View.GONE);
-            postVideoVideoView.setVideoURI(Uri.parse("https://firebasestorage.googleapis.com/v0/b/opinionshare-1585847822926.appspot.com/o/MembersPosts%2Fpostvideo%3A252331?alt=media&token=2175d003-5ddd-452e-b2ae-ae24f0857348"));
+            postVideoVideoView.setVideoURI(Uri.parse(selectedContant));
         } else {
             postVideoVideoView.setVisibility(View.GONE);
             postImageImageView.setVisibility(View.VISIBLE);
