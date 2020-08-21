@@ -202,7 +202,6 @@ public class HomeActivity extends AppCompatActivity {
                     Toast.makeText(HomeActivity.this,"2",Toast.LENGTH_LONG);
 
                     Member friend = dataSnapshot.getValue(Member.class);
-<<<<<<< HEAD
                     ArrayList<Posts> friend_post_list = (ArrayList<Posts>) friend.getPostList();
                     for (int i =0; i<friend_post_list.size();i++)
                     {
@@ -223,23 +222,7 @@ public class HomeActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(HomeActivity.this, "no posts recognized", Toast.LENGTH_LONG).show();
                 }
-                
-=======
-                    Posts post = dataSnapshot.child("postList").getValue(Posts.class);
-                    LocalDate creationDate = LocalDate.parse(post.getCreationDate());
-                    LocalDate cutoffDate = LocalDate.now().minusDays(20);
-                    if(creationDate.isAfter(cutoffDate)){
-                        FriendsPost friendsPost = new FriendsPost();
-                        friendsPost.setPost(post);
-                        friendsPost.setIsvideo(post.getPostType().equals("Video"));
-                        friendsPost.setMtitle(friend.getUsername());
-                        friendsPost.setFriendID(friendID);
-                        allPostFromLast20Days.add(friendsPost);
-                    }
-                } else {
-                    // TODO: change else actions
-                }
->>>>>>> 751b914c8de2b76dcf643b2878acf9d52dc82494
+
             }
 
             @Override
