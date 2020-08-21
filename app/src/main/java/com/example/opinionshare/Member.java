@@ -12,6 +12,16 @@ public class Member {
     private String username;
     private String phoneNumber;
     private String profilePhotoUri;
+
+    public String getPostimageuri() {
+        return postimageuri;
+    }
+
+    public void setPostimageuri(String postimageuri) {
+        this.postimageuri = postimageuri;
+    }
+
+    private String postimageuri;
     private Integer age, likeCounter;
     private ArrayList<String> friendList;
     private ArrayList<String> categoryList;

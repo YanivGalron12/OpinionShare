@@ -79,6 +79,7 @@ public class ProfileActivity extends AppCompatActivity {
     Member userToDisplay = new Member();
     Member member = new Member();
     ArrayList<String> friendList = new ArrayList<>();
+    ArrayList<String> posts_uri = new ArrayList<String>();
 
 
     @Override
@@ -98,7 +99,7 @@ public class ProfileActivity extends AppCompatActivity {
         username_textview = findViewById(R.id.username_textview);
         postGridView = findViewById(R.id.post_grid_view);
 
-        postGridView.setAdapter(new PostAdapter(this));
+        postGridView.setAdapter(new PostAdapter(this, posts_uri));
 
 
         postGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -189,15 +190,26 @@ public class ProfileActivity extends AppCompatActivity {
         addfriend_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Toast.makeText(ProfileActivity.this, "friend button pressed", Toast.LENGTH_LONG).show();
                 if (member.getFriendList() != null) {
                     friendList = (ArrayList<String>) member.getFriendList();
-                    if (friendList.contains(userToDisplay_ID))
+
+                    if (friendList.contains(userToDisplay_ID)) {
+                        Toast.makeText(ProfileActivity.this, "already friends ' now being removed", Toast.LENGTH_LONG).show();
                         friendList.remove(userToDisplay_ID);
-                    addfriend_btn.setText("add friend");
-                } else {
+                        addfriend_btn.setText("add friend");
+                    } else {
+                        friendList.add(userToDisplay_ID);
+                        Toast.makeText(ProfileActivity.this, "new friend added", Toast.LENGTH_LONG).show();
+                        addfriend_btn.setText("remove friend");
+                    }
+                }
+                else {
                     friendList.add(userToDisplay_ID);
+                    Toast.makeText(ProfileActivity.this, "new friend added,now list is not empty", Toast.LENGTH_LONG).show();
                     addfriend_btn.setText("remove friend");
                 }
+
                 member.setFriendList(friendList);
                 addUserToDatabase(member);
 
@@ -219,6 +231,7 @@ public class ProfileActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     if (userToDisplay_ID.equals(memberId)) {
                         member = dataSnapshot.child(memberId).getValue(Member.class);
+                        userToDisplay=member;
                         username_textview.setText(member.getUsername());
                         if (!member.getProfilePhotoUri().equals("NoPhoto")) {
                             Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
@@ -241,6 +254,19 @@ public class ProfileActivity extends AppCompatActivity {
                             }
                         }
                     }
+                    ArrayList<Posts> PostList = (ArrayList<Posts>) userToDisplay.getPostList();
+                    if(PostList!=null)
+                    {
+                        Toast.makeText(ProfileActivity.this, "does have posts", Toast.LENGTH_LONG).show();
+                        for(int i=0;i<PostList.size();i++){
+                            posts_uri.add(PostList.get(i).getPostUri());
+                        }
+                        postGridView.setAdapter(new PostAdapter(ProfileActivity.this, posts_uri));
+                        posts_uri=new ArrayList<String>();
+
+                    }
+                    else
+                        Toast.makeText(ProfileActivity.this, "has no posts", Toast.LENGTH_LONG).show();
 
                 } else {
                     // TODO: change else actions
