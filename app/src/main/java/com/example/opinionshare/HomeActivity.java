@@ -202,6 +202,7 @@ public class HomeActivity extends AppCompatActivity {
                             friendsPost.setMtitle(friend.getUsername());
                             friendsPost.setFriendID(friendID);
                             allPostFromLast20Days.add(friendsPost);
+                            int x = 5 ;
                         }
                     }
                     Toast.makeText(HomeActivity.this, "there are "+allPostFromLast20Days.size()+" posts", Toast.LENGTH_LONG).show();
