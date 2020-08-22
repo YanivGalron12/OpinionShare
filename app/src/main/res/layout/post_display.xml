@@ -20,8 +20,7 @@
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/PostOwnerPhotoImageView1"
                 android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="@drawable/ic_boy" />
+                android:layout_height="30dp" />
 
             <TextView
                 android:id="@+id/PostOwnerNameTextView1"

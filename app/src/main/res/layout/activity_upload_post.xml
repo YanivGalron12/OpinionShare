@@ -5,8 +5,8 @@
     android:paddingTop="16dp">
 
     <ScrollView
-        android:layout_height="match_parent"
-        android:layout_width="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:id="@+id/PostInformationLayout"
@@ -24,8 +24,7 @@
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/PostOwnerPhotoImageView"
                     android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    />
+                    android:layout_height="30dp" />
 
                 <TextView
                     android:id="@+id/PostOwnerNameTextView"
@@ -69,11 +68,11 @@
 
             <com.example.opinionshare.ProportionalVideoView
                 android:id="@+id/PostVideoVideoView"
-                android:layout_gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
+                android:layout_gravity="center"
                 android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
                 android:paddingTop="16dp" />
 
             <EditText
@@ -84,13 +83,14 @@
                 android:hint="Description"
                 android:textSize="14sp"
                 android:textStyle="bold" />
+
             <Button
                 android:id="@+id/upload_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:text="Upload"
-                android:textAllCaps="false"
-                android:layout_gravity="center"/>
+                android:textAllCaps="false" />
         </LinearLayout>
 
     </ScrollView>
