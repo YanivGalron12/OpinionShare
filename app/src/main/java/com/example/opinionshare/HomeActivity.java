@@ -37,7 +37,11 @@ import com.squareup.picasso.Picasso;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -168,80 +172,82 @@ public class HomeActivity extends AppCompatActivity {
         startActivityForResult(intent, SELECT_VIDEO_REQUEST);
     }
 
-    public ArrayList<FriendsPost> getAllFriendsPostFromLast20Days(Member member) {
-
-        ArrayList<FriendsPost> allPostFromLast20Days = new ArrayList<>();
+    public void getAllFriendsPostFromLast20Days(Member member) {
         try {
-            ArrayList<String> FriendsID = (ArrayList<String>) member.getFriendList();
+            ArrayList<FriendsPost> allPostFromLast20Days = new ArrayList<>();
+            ArrayList<String> ownersProfilePhoto = new ArrayList<>();
 
+            ArrayList<String> FriendsID = (ArrayList<String>) member.getFriendList();
             for (String friendID : FriendsID) {
-                allPostFromLast20Days.addAll(getPostFromLast20Days(friendID));
+                DatabaseReference postRef = mFirebaseDatabase.getReference().child("users").child(friendID);
+                postRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        // This method is called once with the initial value and again
+                        // whenever data at this Location is updated
+                        Log.d(TAG, "onDataChange: Added information to database: \n" +
+                                dataSnapshot.getValue());
+                        Toast.makeText(HomeActivity.this, "1", Toast.LENGTH_LONG);
+
+                        if (dataSnapshot.exists()) {
+                            Toast.makeText(HomeActivity.this, "2", Toast.LENGTH_LONG);
+
+                            Member friend = dataSnapshot.getValue(Member.class);
+                            int size = 0;
+                            ArrayList<Posts> friend_post_list = new ArrayList<>();
+                            friend_post_list = (ArrayList<Posts>) friend.getPostList();
+                            try {
+                                size = friend_post_list.size();
+                            } catch (Exception e) {
+                                size = 0;
+                            }
+
+                            for (int i = 0; i < size; i++) {
+                                Posts post = friend_post_list.get(i);
+                                LocalDate creationDate = LocalDate.parse(post.getCreationDate());
+                                LocalDate cutoffDate = LocalDate.now().minusDays(20);
+                                if (creationDate.isAfter(cutoffDate)) {
+                                    FriendsPost friendsPost = new FriendsPost();
+                                    friendsPost.setPost(post);
+                                    friendsPost.setIsvideo(post.getPostType().equals("Video"));
+                                    friendsPost.setMtitle(friend.getUsername());
+                                    friendsPost.setFriendID(friendID);
+                                    allPostFromLast20Days.add(friendsPost);
+                                    ownersProfilePhoto.add(friend.getProfilePhotoUri());
+                                }
+                            }
+
+                            if (allPostFromLast20Days.size() != 0) {
+                                Toast.makeText(HomeActivity.this, "there are " + allPostFromLast20Days.size() + " posts", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(HomeActivity.this, "no posts recognized", Toast.LENGTH_LONG).show();
+                            }
+                            String friend_to_post_list[] = new String[allPostFromLast20Days.size()];
+                            int i = 0;
+                            for (FriendsPost friendsPost : allPostFromLast20Days) {
+                                Toast.makeText(HomeActivity.this, "3", Toast.LENGTH_SHORT);
+                                friend_to_post_list[allPostFromLast20Days.size() - 1 - i] = friendsPost.getFriendID();
+                                i = i + 1;
+                            }
+                            Collections.reverse(allPostFromLast20Days);
+                            Collections.reverse(ownersProfilePhoto);
+                            MyAdapter adapter = new MyAdapter(HomeActivity.this,allPostFromLast20Days, friend_to_post_list, ownersProfilePhoto);
+                            postsListView.setAdapter(adapter);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        // Failed to read value
+                        Log.w(TAG, "Failed to read value.", databaseError.toException());
+                    }
+                });
             }
         } catch (Exception e) {
             Toast.makeText(HomeActivity.this, e.toString(), Toast.LENGTH_SHORT);
-            return allPostFromLast20Days;
         }
-
-        return allPostFromLast20Days;
     }
 
-    public ArrayList<FriendsPost> getPostFromLast20Days(String friendID) {
 
-        ArrayList<FriendsPost> allPostFromLast20Days = new ArrayList<>();
-
-        DatabaseReference postRef = mFirebaseDatabase.getReference().child("users").child(friendID);
-        postRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this Location is updated
-                Log.d(TAG, "onDataChange: Added information to database: \n" +
-                        dataSnapshot.getValue());
-                Toast.makeText(HomeActivity.this, "1", Toast.LENGTH_LONG);
-
-                if (dataSnapshot.exists()) {
-                    Toast.makeText(HomeActivity.this, "2", Toast.LENGTH_LONG);
-
-                    Member friend = dataSnapshot.getValue(Member.class);
-                    int size = 0;
-                    ArrayList<Posts> friend_post_list = new ArrayList<Posts>();
-                    try {
-                        friend_post_list = (ArrayList<Posts>) friend.getPostList();
-                    } catch (Exception e) {
-                    }
-                    size = friend_post_list.size();
-
-                    for (int i = 0; i < size; i++) {
-                        Posts post = friend_post_list.get(i);
-                        LocalDate creationDate = LocalDate.parse(post.getCreationDate());
-                        LocalDate cutoffDate = LocalDate.now().minusDays(20);
-                        if (creationDate.isAfter(cutoffDate)) {
-                            FriendsPost friendsPost = new FriendsPost();
-                            friendsPost.setPost(post);
-                            friendsPost.setIsvideo(post.getPostType().equals("Video"));
-                            friendsPost.setMtitle(friend.getUsername());
-                            friendsPost.setFriendID(friendID);
-                            allPostFromLast20Days.add(friendsPost);
-                            int x = 5;
-                        }
-                    }
-                    Toast.makeText(HomeActivity.this, "there are " + allPostFromLast20Days.size() + " posts", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(HomeActivity.this, "no posts recognized", Toast.LENGTH_LONG).show();
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", databaseError.toException());
-            }
-        });
-
-
-        return allPostFromLast20Days;
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -293,14 +299,17 @@ public class HomeActivity extends AppCompatActivity {
 
     class MyAdapter extends ArrayAdapter<String> {
         Context context;
-        String rTitle[];
-        Boolean rIsVideo[];
+        ArrayList<FriendsPost> rAllPostFromLast20Days;
+        String rFriend_to_post_list[];
+        ArrayList<String> rOwnersProfilePhoto;
 
-        MyAdapter(Context c, String title[], Boolean isVideo[]) {
-            super(c, R.layout.post_display, R.id.PostOwnerNameTextView1, title);
+        MyAdapter(Context c, ArrayList<FriendsPost> allPostFromLast20Days,String friend_to_post_list[], ArrayList<String> ownersProfilePhoto) {
+            super(c, R.layout.post_display, R.id.PostOwnerNameTextView1,friend_to_post_list);
             this.context = c;
-            this.rTitle = title;
-            this.rIsVideo = isVideo;
+            this.rAllPostFromLast20Days = allPostFromLast20Days;
+            this.rFriend_to_post_list = friend_to_post_list;
+            this.rOwnersProfilePhoto = ownersProfilePhoto;
+
         }
 
         @NonNull
@@ -316,14 +325,24 @@ public class HomeActivity extends AppCompatActivity {
             TextView postRequestTextView = post_display.findViewById(R.id.PostRequestTextView1);
             TextView postDescriptionTextView = post_display.findViewById(R.id.PostDescriptionTextView1);
 
+            FriendsPost currentPost =rAllPostFromLast20Days.get(position);
+            String rTitle = currentPost.getMtitle();
+            Boolean rIsVideo = currentPost.getIsvideo();
+            Posts ThisPost = currentPost.getPost();
             // now set our resources
-            postOwnerNameTextView.setText(rTitle[position]);
-            if (rIsVideo[position]) {
+            postOwnerNameTextView.setText(rTitle);
+            if (rIsVideo) {
                 postVideoVideoView.setVisibility(View.VISIBLE);
                 postImageImageView.setVisibility(View.GONE);
             } else {
                 postVideoVideoView.setVisibility(View.GONE);
                 postImageImageView.setVisibility(View.VISIBLE);
+                Picasso.get().load(ThisPost.getPostUri()).into(postImageImageView);
+                postCategoryTextView.setText(ThisPost.getCategory());
+                postDescriptionTextView.setText(ThisPost.getDescription());
+                postRequestTextView.setText(ThisPost.getCaption());
+                Picasso.get().load(rOwnersProfilePhoto.get(position)).into(postOwnerPhotoImageView);
+
             }
             return post_display;
         }
@@ -343,22 +362,8 @@ public class HomeActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
                     member = dataSnapshot.child("users").child(memberId).getValue(Member.class);
-                    ArrayList<FriendsPost> allPostFromLast20Days = getAllFriendsPostFromLast20Days(member);
-                    String mTitle[] = new String[allPostFromLast20Days.size()];
-                    Boolean mIsVideo[] = new Boolean[allPostFromLast20Days.size()];
-                    String friend_to_post_list[] = new String[allPostFromLast20Days.size()];
-                    int i = 0;
-                    for (FriendsPost friendsPost : allPostFromLast20Days) {
-                        Toast.makeText(HomeActivity.this, "3", Toast.LENGTH_SHORT);
+                    getAllFriendsPostFromLast20Days(member);
 
-                        mTitle[i] = friendsPost.getMtitle();
-                        mIsVideo[i] = friendsPost.getIsvideo();
-                        friend_to_post_list[i] = friendsPost.getFriendID();
-                        i = i + 1;
-                    }
-
-                    MyAdapter adapter = new MyAdapter(HomeActivity.this, mTitle, mIsVideo);
-                    postsListView.setAdapter(adapter);
                 } else {
                     // TODO: change else actions
                     Toast.makeText(HomeActivity.this, "data does not exist", Toast.LENGTH_LONG).show();

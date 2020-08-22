@@ -14,7 +14,7 @@ import java.net.URI;
 import java.util.ArrayList;
 
 public class PostAdapter extends BaseAdapter {
-
+// PROFILE POST ADAPTER
     private Context mContext;
     public  ArrayList<String> postArray = new ArrayList<String>();
 //            "https://images.unsplash.com/photo-1536366764833-579c4e583927?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
