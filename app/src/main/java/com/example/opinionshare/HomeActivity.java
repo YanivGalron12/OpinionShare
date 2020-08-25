@@ -6,10 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.TimeUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +36,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -44,6 +48,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import bolts.Bolts;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -257,10 +262,17 @@ public class HomeActivity extends AppCompatActivity {
             Intent intent = new Intent(HomeActivity.this, UploadPostActivity.class);
             //444444
             StorageReference postRef = mStorageRef.child("postRef" + selectedImage.getLastPathSegment());
+            StorageReference takePost = mStorageRef.child("resizes").child("postRef" + selectedImage.getLastPathSegment()+"_200x200");
             postRef.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    postRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    Toast.makeText(HomeActivity.this, "Uploading", Toast.LENGTH_LONG).show();
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    takePost.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
                             selectedImage = uri;
@@ -269,7 +281,6 @@ public class HomeActivity extends AppCompatActivity {
                             intent.putExtra(URI_SELECTED, selectedImage.toString());
                             startActivity(intent);
                         }
-
                     });
                 }
             });
