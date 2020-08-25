@@ -105,7 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profileImage);
         OldUserName = edit_text_username.getText().toString();
 
-
+        Picasso.get().load("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcThwba7bWlXMP_8RyrorKR_NqUpHKlZMBcAJNxzdOMiOC7d5csj&usqp=CAU").into(profileImage);
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference().child("MemberProfilePhoto");
         usersRef = mFirebaseDatabase.getReference().child("users");

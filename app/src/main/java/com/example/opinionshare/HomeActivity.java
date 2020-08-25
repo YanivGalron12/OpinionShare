@@ -258,17 +258,18 @@ public class HomeActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
+            Toast.makeText(HomeActivity.this, "Uploading", Toast.LENGTH_LONG).show();
             selectedImage = data.getData();
             Intent intent = new Intent(HomeActivity.this, UploadPostActivity.class);
             //444444
             StorageReference postRef = mStorageRef.child("postRef" + selectedImage.getLastPathSegment());
-            StorageReference takePost = mStorageRef.child("resizes").child("postRef" + selectedImage.getLastPathSegment()+"_200x200");
+            StorageReference takePost = mStorageRef.child("resizes").child("postRef" + selectedImage.getLastPathSegment()+"_2000x2000");
             postRef.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Toast.makeText(HomeActivity.this, "Uploading", Toast.LENGTH_LONG).show();
                     try {
                         Thread.sleep(5000);
+                        Toast.makeText(HomeActivity.this, "test", Toast.LENGTH_LONG).show();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
