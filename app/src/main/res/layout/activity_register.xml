@@ -32,7 +32,6 @@
             android:layout_below="@+id/Text"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="6dp"
-            android:background="@drawable/ic_home"
             android:elevation="4dp"
             app:civ_border_color="#FF000000"
             app:civ_border_width="2dp" />

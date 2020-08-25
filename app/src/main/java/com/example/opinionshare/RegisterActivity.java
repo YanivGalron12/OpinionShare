@@ -105,7 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profileImage);
         OldUserName = edit_text_username.getText().toString();
 
-
+        Picasso.get().load("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcThwba7bWlXMP_8RyrorKR_NqUpHKlZMBcAJNxzdOMiOC7d5csj&usqp=CAU").into(profileImage);
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference().child("MemberProfilePhoto");
         usersRef = mFirebaseDatabase.getReference().child("users");
@@ -207,15 +207,23 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
+            Toast.makeText(RegisterActivity.this, "Uploading", Toast.LENGTH_LONG).show();
             Uri selectedImage = data.getData();
             profileImage.setImageURI(selectedImage);
             // TODO: photo needs to be downloaded and then stored in our database (Firestore ?) as file
             StorageReference Imagename = mStorageRef.child("image" + selectedImage.getLastPathSegment());
+            StorageReference takeImage = mStorageRef.child("resizes").child("image" + selectedImage.getLastPathSegment()+"_200x200");
+
             Imagename.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Toast.makeText(RegisterActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
-                    Imagename.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    try {
+                        Thread.sleep(3000);
+                        Toast.makeText(RegisterActivity.this, "test", Toast.LENGTH_LONG).show();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    takeImage.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
                             member.setProfilePhotoUri(uri.toString());

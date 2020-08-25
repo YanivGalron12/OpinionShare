@@ -89,7 +89,6 @@
         android:layout_below="@+id/userinformation_layout"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="-60dp"
-        android:background="@drawable/ic_home"
         android:elevation="4dp"
         app:civ_border_color="#FF000000"
         app:civ_border_width="2dp" />
