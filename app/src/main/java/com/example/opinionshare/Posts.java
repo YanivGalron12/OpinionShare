@@ -8,17 +8,19 @@ public class Posts {
 
     private Integer likeCounter;
     private String creationDate;
+    private String timeStamp;
     private String category;
     private String postUri;
     private String postType;
     private String caption;
     private String description;
+    private boolean forSale;
 
     public Posts() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Posts(String description, String postUri, String postType, String caption,  Integer likeCounter, String creationDate, String category) {
+    public Posts(String description, String postUri, String postType, String caption,  Integer likeCounter, String creationDate, String category, boolean forSale,String timeStamp) {
         this.description = description;
         this.likeCounter = likeCounter;
         this.creationDate = creationDate;
@@ -26,6 +28,23 @@ public class Posts {
         this.caption = caption;
         this.postUri = postUri;
         this.postType = postType;
+        this.forSale = forSale;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public boolean getForSale() {
+        return forSale;
+    }
+
+    public void setForSale(boolean forSale) {
+        this.forSale = forSale;
     }
 
     public String getPostUri() {

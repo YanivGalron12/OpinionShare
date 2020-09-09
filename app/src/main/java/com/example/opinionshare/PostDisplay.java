@@ -53,15 +53,21 @@ public class PostDisplay extends AppCompatActivity {
     FirebaseUser user;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference usersRef;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.post_display);
 
-        Intent intent = getIntent();
+        intent = getIntent();
         userToDisplay_ID = intent.getStringExtra("USER_TO_DISPLAY");
-        postToShow_position = Integer.parseInt(Objects.requireNonNull(intent.getStringExtra("POST_LOCATION")));
+        String position = intent.getStringExtra("POST_LOCATION");
+        if (!position.equals("Irrelevant")) {
+            postToShow_position = Integer.parseInt(position);
+        } else {
+            postToShow_position = -11;
+        }
 
 
         postOwnerPhotoImageView = findViewById(R.id.PostOwnerPhotoImageView1);
@@ -72,10 +78,10 @@ public class PostDisplay extends AppCompatActivity {
         postImageImageView = findViewById(R.id.PostImageImageView1);
         postVideoVideoView = findViewById(R.id.PostVideoVideoView1);
 
-        postVideoVideoView.setOnClickListener(new View.OnClickListener(){
+        postVideoVideoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (postVideoVideoView.isPlaying()){
+                if (postVideoVideoView.isPlaying()) {
                     postVideoVideoView.pause();
                 } else {
                     postVideoVideoView.start();
@@ -104,7 +110,18 @@ public class PostDisplay extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     member = dataSnapshot.child(memberId).getValue(Member.class);
                     userToDisplay = dataSnapshot.child(userToDisplay_ID).getValue(Member.class);
-                    Posts postToShow = userToDisplay.getPostByPosition(postToShow_position);
+                    Posts postToShow = new Posts();
+                    if (postToShow_position != -11){
+                        postToShow = userToDisplay.getPostByPosition(postToShow_position);
+                    }
+                    else{
+                        String[] postDetails = intent.getStringArrayExtra("POST_DETAILS");
+                        postToShow.setCategory(postDetails[0]);
+                        postToShow.setCaption(postDetails[1]);
+                        postToShow.setDescription(postDetails[2]);
+                        postToShow.setPostType(postDetails[3]);                        postToShow.setCategory(postDetails[0]);
+                        postToShow.setPostUri(postDetails[4]);
+                    }
 
 
                     Picasso.get().load(userToDisplay.getProfilePhotoUri()).into(postOwnerPhotoImageView);
@@ -119,7 +136,7 @@ public class PostDisplay extends AppCompatActivity {
                     if (postType.equals("Video")) {
                         postImageImageView.setVisibility(View.GONE);
                         postVideoVideoView.setVisibility(View.VISIBLE);
-                        
+
                     } else {
                         postImageImageView.setVisibility(View.VISIBLE);
                         postVideoVideoView.setVisibility(View.GONE);

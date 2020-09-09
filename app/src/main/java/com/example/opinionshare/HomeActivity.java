@@ -3,6 +3,7 @@ package com.example.opinionshare;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
 import android.content.Context;
 import android.content.Intent;
@@ -201,6 +202,9 @@ public class HomeActivity extends AppCompatActivity {
                             int size = 0;
                             ArrayList<Posts> friend_post_list = new ArrayList<>();
                             friend_post_list = (ArrayList<Posts>) friend.getPostList();
+                            if(friend_post_list!= null){
+                                friend_post_list.removeAll(Collections.singleton(null));
+                            }
                             try {
                                 size = friend_post_list.size();
                             } catch (Exception e) {
@@ -260,7 +264,6 @@ public class HomeActivity extends AppCompatActivity {
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
             Toast.makeText(HomeActivity.this, "Uploading", Toast.LENGTH_LONG).show();
             selectedImage = data.getData();
-            Intent intent = new Intent(HomeActivity.this, UploadPostActivity.class);
             //444444
             StorageReference postRef = mStorageRef.child("postRef" + selectedImage.getLastPathSegment());
             StorageReference takePost = mStorageRef.child("resizes").child("postRef" + selectedImage.getLastPathSegment()+"_2000x2000");
@@ -268,7 +271,7 @@ public class HomeActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(10000);
                         Toast.makeText(HomeActivity.this, "test", Toast.LENGTH_LONG).show();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -276,7 +279,9 @@ public class HomeActivity extends AppCompatActivity {
                     takePost.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
+                            Toast.makeText(HomeActivity.this, "test2", Toast.LENGTH_LONG).show();
                             selectedImage = uri;
+                            Intent intent = new Intent(HomeActivity.this, UploadPostActivity.class);
                             Toast.makeText(HomeActivity.this, "HappyPhotoUploaded", Toast.LENGTH_LONG).show();
                             intent.putExtra(POST_TYPE, "Image");
                             intent.putExtra(URI_SELECTED, selectedImage.toString());

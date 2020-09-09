@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,19 +27,22 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UploadPostActivity extends AppCompatActivity {
-
+    private static final String TAG = "UPLOAD_POST_ACTIVITY_FOR_SALE_LIST:";
     CircleImageView postOwnerPhotoImageView;
     TextView postOwnerNameTextView;
     EditText postCategoryEditText;
     EditText postRequestEditText;
     EditText postDescriptionEditText;
+    CheckBox forSaleCheckBox;
     ProportionalImageView postImageImageView;
     ProportionalVideoView postVideoVideoView;
     String selectedContant, postType;
@@ -49,9 +54,11 @@ public class UploadPostActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference usersRef;
+    private DatabaseReference forSaleListRef;
     Member member = new Member();
     Posts post = new Posts();
     List<Posts> PostList = new ArrayList<Posts>();
+    ArrayList<PostForSale> forSaleList = new ArrayList<PostForSale>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,10 +76,13 @@ public class UploadPostActivity extends AppCompatActivity {
         postImageImageView = findViewById(R.id.PostImageImageView);
         postVideoVideoView = findViewById(R.id.PostVideoVideoView);
         upload_button = findViewById(R.id.upload_button);
+        forSaleCheckBox = findViewById(R.id.ForSaleCheckBox);
 
         user = auth.getCurrentUser();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         usersRef = mFirebaseDatabase.getReference().child("users");
+        forSaleListRef = mFirebaseDatabase.getReference().child("ForSaleList");
+
         memberId = user.getUid();
         postVideoVideoView.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -91,23 +101,34 @@ public class UploadPostActivity extends AppCompatActivity {
                 Toast.makeText(UploadPostActivity.this, postType + " Upload", Toast.LENGTH_SHORT).show();
 
                 post.setCreationDate(java.time.LocalDate.now().toString());
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                post.setTimeStamp(Long.toString(timestamp.getTime()));
                 post.setPostType(postType);
                 post.setPostUri(Uri.parse(selectedContant).toString());//TODO: change link to be the link to the storage and not internal location
                 post.setLikeCounter(0);
                 post.setCaption(postCategoryEditText.getText().toString());
                 post.setDescription(postDescriptionEditText.getText().toString());
                 post.setCategory(postCategoryEditText.getText().toString());
+                post.setForSale(forSaleCheckBox.isChecked());
                 if (member.getPostList()!=null) {
                     PostList  = member.getPostList();
                 }
                 PostList.add(post);
+                PostForSale postForSale = new PostForSale();
+                postForSale.setOwnerId(memberId);
+                postForSale.setPost(post);
+                postForSale.setTimeStamp(post.getTimeStamp());
                 member.setPostList(PostList);
                 addPostToDatabase(member);
+                if(post.getForSale()){
+                    forSaleList.add(postForSale);
+                    forSaleListRef.setValue(forSaleList);
+                }
                 startActivity(new Intent(getApplicationContext(), HomeActivity.class));
-
-
+                finish();
             }
         });
+
 
         if (postType.equals("Video")) {
             postVideoVideoView.setVisibility(View.VISIBLE);
@@ -137,10 +158,34 @@ public class UploadPostActivity extends AppCompatActivity {
                     Toast.makeText(UploadPostActivity.this, "data does not exist", Toast.LENGTH_LONG).show();
                 }
             }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "Failed to read value.", databaseError.toException());
+            }
+        });
+
+        forSaleListRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this Location is updated
+                Log.d(TAG, "onDataChange: Added information to database: \n" +
+                        dataSnapshot.getValue());
+                if (dataSnapshot.exists()) {
+
+                    for (DataSnapshot d : dataSnapshot.getChildren()) {
+                        forSaleList.add(d.getValue(PostForSale.class));
+                    }
+                } else {
+                    // TODO: change else actions
+                    Toast.makeText(UploadPostActivity.this, "ForSale list data does not exist", Toast.LENGTH_LONG).show();
+                }
+            }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", databaseError.toException());
             }
         });
     }

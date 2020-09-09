@@ -6,15 +6,36 @@
     android:layout_height="match_parent"
     tools:context=".ShopActivity">
 
+    <LinearLayout
+        android:id="@+id/userpost_layout"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/userinformation_layout"
+        android:layout_height="match_parent"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Shop"
+            android:textSize="50sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_centerInParent="true"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Shop"
-        android:textSize="50sp"
-        android:textStyle="bold"
-        android:layout_centerInParent="true"/>
+        <GridView
+            android:id="@+id/forSale_grid_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:horizontalSpacing="10dp"
+            android:minWidth="150dp"
+            android:columnWidth="200dp"
+            android:verticalSpacing="10dp"
+            android:gravity="center"
+            android:background="@color/com_facebook_blue"
+            android:numColumns="2"
+            />
+    </LinearLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"

@@ -84,6 +84,14 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
+            <CheckBox
+                android:id="@+id/ForSaleCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="product for sale"
+                android:layout_gravity="center"
+                android:textAlignment="center" />
+
             <Button
                 android:id="@+id/upload_button"
                 android:layout_width="wrap_content"

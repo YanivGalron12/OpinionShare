@@ -64,8 +64,6 @@ public class ProfileActivity extends AppCompatActivity {
     TextView username_textview, text;
     Button signout_btn, info_btn, addfriend_btn;
     GridView postGridView;
-
-
     CircleImageView profileImage;
 
     // add Firebase Database stuff

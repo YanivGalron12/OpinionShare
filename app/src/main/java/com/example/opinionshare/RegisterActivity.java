@@ -68,10 +68,7 @@ public class RegisterActivity extends AppCompatActivity {
     private DocumentReference mDocRef;
 
     // member details
-//    GenericTypeIndicator<List<String>> t = new GenericTypeIndicator<List<String>>() {};
     HashMap<String,String> usersMap = new HashMap<>();
-
-    String[] newUserToAdd;
     boolean userexists = false;
     String memberProfilePhotoUri;
     String memberPhoneNumber;
@@ -82,7 +79,7 @@ public class RegisterActivity extends AppCompatActivity {
     String OldUserName;
     String memberId;
     Member member = new Member();
-    //    ArrayList<String> friendslist = new ArrayList<>();
+
     // Activity UI
     TextView change_profile_photo_TextView;
     EditText edit_text_username;
@@ -137,9 +134,8 @@ public class RegisterActivity extends AppCompatActivity {
                 newUserName = edit_text_username.getText().toString();
                 if (!newUserName.equals("")) {
                     if (!newUserName.equals(memberUserName)&&!usersMap.containsValue(newUserName)) {
-//                        String[] oldUserToRemove = new String[]{memberUserName,memberId};
-                       usersMap.remove(memberId,memberUserName);
-                       usersMap.put(memberId,newUserName);
+                        usersMap.remove(memberId,memberUserName);
+                        usersMap.put(memberId,newUserName);
                         member.setUsername(newUserName);
                         memberUserName = member.getUsername();
                         Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
@@ -149,10 +145,6 @@ public class RegisterActivity extends AppCompatActivity {
                         finish();
                         addUserToDatabase(member);
                         usersMapRef.setValue(usersMap);
-
-
-//                        friendslist.add(newUserToAdd.getUsername());
-
                     }
                     else {
                         if (newUserName.equals(memberUserName)) {
@@ -166,10 +158,7 @@ public class RegisterActivity extends AppCompatActivity {
                             Toast.makeText(RegisterActivity.this, "UserName is taken", Toast.LENGTH_SHORT).show();
                         }
                     }
-
-
                 } else {
-
                     Toast.makeText(RegisterActivity.this, "UserName can't be empty", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -187,8 +176,6 @@ public class RegisterActivity extends AppCompatActivity {
         memberEmail = user.getEmail();
         memberName = user.getDisplayName();
         memberPhoneNumber = user.getPhoneNumber();
-
-
         if (user.getPhotoUrl() != null) {
             memberProfilePhotoUri = user.getPhotoUrl().toString();
         } else {
@@ -200,7 +187,6 @@ public class RegisterActivity extends AppCompatActivity {
         // Display user details
         edit_text_email.setText(memberEmail);
         edit_text_fullname.setText(memberName);
-
     }
 
     @Override
@@ -218,7 +204,7 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(1000);
                         Toast.makeText(RegisterActivity.this, "test", Toast.LENGTH_LONG).show();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -232,7 +218,6 @@ public class RegisterActivity extends AppCompatActivity {
                     });
                 }
             });
-
         }
     }
 
@@ -261,7 +246,6 @@ public class RegisterActivity extends AppCompatActivity {
                     edit_text_username.setText(memberUserName);
                     Picasso.get().load(memberProfilePhotoUri).into(profileImage);
 
-
                 } else {
                     if (!(metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp())) {
                         FirebaseUser user = auth.getCurrentUser();
@@ -289,26 +273,6 @@ public class RegisterActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
 
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
-//
-//                        Object value = d.getValue();
-//                        UserToShow tD = new UserToShow();
-//                        if (value instanceof List) {
-//                            List<Object> t = (List<Object>) value;
-//                            tD.setId((String) t.get(0));
-//                            tD.setUsername((String) t.get(1));
-//                            // do your magic with values
-//                        } else {
-//                            // handle other possible types
-//                            HashMap<String, String> map = (HashMap<String, String>) value;
-//                            //Getting Collection of values from HashMap
-//                            Collection<String> values = map.values();
-//                            //Creating an ArrayList of values
-//                            ArrayList<String> listOfValues = new ArrayList<String>(values);
-//                            tD.setId(listOfValues.get(0));
-//                            tD.setUsername(listOfValues.get(1));
-//
-//                        }
-//
                         usersMap.put((String)d.getKey(),(String)d.getValue());
                     }
                 } else {
@@ -316,7 +280,6 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "users list data does not exist", Toast.LENGTH_LONG).show();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Failed to read value
