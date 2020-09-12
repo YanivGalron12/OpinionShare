@@ -155,9 +155,18 @@ public class ShopActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
-                        forSaleList.add(d.getValue(PostForSale.class));
-                        PostForSale postForSale = d.getValue(PostForSale.class);
-                        posts_uri.add(postForSale.getPost().getPostUri());
+                        PostForSale postForSale=d.getValue(PostForSale.class);
+                        boolean flag=false;
+                        for(int i=0;i<forSaleList.size();i++) {
+                            PostForSale currpost = forSaleList.get(i);
+                            if (currpost.getTimeStamp() == postForSale.getTimeStamp()
+                                    && currpost.getOwnerId() == postForSale.getOwnerId())
+                                flag = true;//a check meant to prevent unwanted multiplicity
+                        }
+                        if(flag==false) {
+                            forSaleList.add(postForSale);
+                            posts_uri.add(postForSale.getPost().getPostUri());
+                        }
                     }
                     forSale_grid_view.setAdapter(new PostAdapter(ShopActivity.this, posts_uri));
                 } else {
