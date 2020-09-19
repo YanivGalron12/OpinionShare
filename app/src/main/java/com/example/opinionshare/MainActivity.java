@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                     // This is an existing user.
                     // TODO: show welcome back screen?
                     Toast.makeText(this, "Welcome back my old friend", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(MainActivity.this, RegisterActivity.class));
+                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
                     finish();
                 }
             } else {

@@ -2,6 +2,7 @@ package com.example.opinionshare;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -52,12 +53,13 @@ import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements DeleteDialog.NoticeDialogListener{
 
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     private static final String POST_LOCATION = "POST_LOCATION";
     private static final String TAG = "AddToDatabase";
     private FirebaseAuth mAuth;
+
 
 
     // UI Objects
@@ -78,6 +80,9 @@ public class ProfileActivity extends AppCompatActivity {
     Member member = new Member();
     ArrayList<String> friendList = new ArrayList<>();
     ArrayList<String> posts_uri = new ArrayList<String>();
+    int PositionOfPost;
+    boolean userprofile=false;// if this is the current user's profile or someone else's
+    boolean DeletePost=false;//if user decide to delete post or not
 
 
     @Override
@@ -99,17 +104,28 @@ public class ProfileActivity extends AppCompatActivity {
 
         postGridView.setAdapter(new PostAdapter(this, posts_uri));
 
+            postGridView.setOnItemLongClickListener((AdapterView.OnItemLongClickListener) (parent, view, position, id) -> {
+                if(userprofile==true) {
+                    //option of deleting post from user profile and database
+                    PositionOfPost = position;
+                    openDialog();
+                }
+                return true;
+            });
 
         postGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // go to PostDisplay activity and pass to that activity which user is currently looked on and which post to show
-                Intent intent = new Intent(ProfileActivity.this,PostDisplay.class);
-                intent.putExtra(USER_TO_DISPLAY,userToDisplay_ID);
-                intent.putExtra(POST_LOCATION, String.valueOf(position));
-                startActivity(intent);
+
+                    Intent intent = new Intent(ProfileActivity.this, PostDisplay.class);
+                    intent.putExtra(USER_TO_DISPLAY, userToDisplay_ID);
+                    intent.putExtra(POST_LOCATION, String.valueOf(position));
+                    startActivity(intent);
+
             }
         });
+
 
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -147,12 +163,12 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+
+
         user = auth.getCurrentUser();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         usersRef = mFirebaseDatabase.getReference().child("users");
         memberId = user.getUid();
-
-
         String userDisplayName = user.getDisplayName();
         Uri photoUri = user.getPhotoUrl();
         if (!userToDisplay_ID.equals(memberId)) {
@@ -164,6 +180,7 @@ public class ProfileActivity extends AppCompatActivity {
             addfriend_btn.setVisibility(View.VISIBLE);
 
         } else {
+            userprofile=true;
             signout_btn.setEnabled(true);
             signout_btn.setVisibility(View.VISIBLE);
             info_btn.setEnabled(true);
@@ -215,6 +232,21 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    public void openDialog() {
+        DeleteDialog deletedialog = new DeleteDialog();
+        deletedialog.show(getSupportFragmentManager(),"delete dialog"); //showing dialog of deleting option
+    }
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) { //if user decides to delete post
+        DeletePost=true;
+        onStart();//where all the post grid is created and where the user data can be updated
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -253,15 +285,26 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     }
                     ArrayList<Posts> PostList = (ArrayList<Posts>) userToDisplay.getPostList();
+
                     if(PostList!=null)
                     {
                         Toast.makeText(ProfileActivity.this, "does have posts", Toast.LENGTH_LONG).show();
-                        for(int i=0;i<PostList.size();i++){
-                            posts_uri.add(PostList.get(i).getPostUri());
+                        if(DeletePost==true) {
+                            PostList.remove(PositionOfPost);//removing post user deletes
                         }
-                        postGridView.setAdapter(new PostAdapter(ProfileActivity.this, posts_uri));
-                        posts_uri=new ArrayList<String>();
+                        if(PostList!=null) {
+                            for (int i = 0; i < PostList.size(); i++) {
+                                posts_uri.add(PostList.get(i).getPostUri());
+                            }
 
+
+                            DeletePost = false;
+                            userToDisplay.setPostList(PostList);
+                            addUserToDatabase(userToDisplay);
+                        }
+
+                        postGridView.setAdapter(new PostAdapter(ProfileActivity.this, posts_uri));// new adapter that does not include deleted post
+                        posts_uri=new ArrayList<String>();
                     }
                     else
                         Toast.makeText(ProfileActivity.this, "has no posts", Toast.LENGTH_LONG).show();
@@ -297,4 +340,5 @@ public class ProfileActivity extends AppCompatActivity {
         String memberId = member.getUserId();
         usersRef.child(memberId).setValue(member);
     }
+
 }
