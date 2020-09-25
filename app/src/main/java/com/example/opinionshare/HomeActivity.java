@@ -234,7 +234,7 @@ public class HomeActivity extends AppCompatActivity {
             selectedImage = data.getData();
             //444444
             StorageReference postRef = mStorageRef.child("postRef" + selectedImage.getLastPathSegment());
-            StorageReference takePost = mStorageRef.child("resizes").child("postRef" + selectedImage.getLastPathSegment()+"_2000x2000");
+            StorageReference takePost = mStorageRef.child("resizes").child("postRef" + selectedImage.getLastPathSegment()+"_1000x1000");
             postRef.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -323,7 +323,15 @@ public class HomeActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
                     member = dataSnapshot.child("users").child(memberId).getValue(Member.class);
-                    getAllFriendsPostFromLast20Days(member);
+                    if(member.getFriendList()!=null){
+                        NoPostsTextView.setText("No Posts");
+                        NoPostsTextView.setVisibility(View.GONE);
+                        getAllFriendsPostFromLast20Days(member);
+                    }
+                    else{
+                        NoPostsTextView.setVisibility(View.VISIBLE);
+                        NoPostsTextView.setText("No Friends");
+                    }
 
                 } else {
                     // TODO: change else actions

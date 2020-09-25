@@ -204,7 +204,7 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(10000);
                         Toast.makeText(RegisterActivity.this, "test", Toast.LENGTH_LONG).show();
                     } catch (InterruptedException e) {
                         e.printStackTrace();

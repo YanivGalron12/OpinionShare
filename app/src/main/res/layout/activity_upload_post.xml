@@ -66,15 +66,6 @@
                 android:paddingTop="16dp"
                 android:src="@drawable/ic_boy" />
 
-            <com.example.opinionshare.ProportionalVideoView
-                android:id="@+id/PostVideoVideoView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:adjustViewBounds="true"
-                android:background="@android:color/transparent"
-                android:paddingTop="16dp" />
-
             <EditText
                 android:id="@+id/PostDescriptionEditText"
                 android:layout_width="match_parent"
