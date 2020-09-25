@@ -54,6 +54,15 @@
             android:text="Can you guys please help me?"
             android:textSize="14sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/PostDescriptionTextView1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="This is the description. here i wiil give you more details about my problem and hope you can solve it"
+            android:textSize="14sp"
+            android:textStyle="bold" />
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="400dp"
@@ -78,14 +87,6 @@
 
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/PostDescriptionTextView1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="This is the description. here i wiil give you more details about my problem and hope you can solve it"
-            android:textSize="14sp"
-            android:textStyle="bold" />
 
 
 

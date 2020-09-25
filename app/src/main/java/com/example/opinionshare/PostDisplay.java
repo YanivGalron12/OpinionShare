@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -40,7 +42,7 @@ public class PostDisplay extends AppCompatActivity {
     TextView postRequestTextView;
     TextView postDescriptionTextView;
     ProportionalImageView postImageImageView;
-    Button likeButton;
+    ToggleButton likeButton;
 
 
     String userToDisplay_ID;
@@ -58,7 +60,7 @@ public class PostDisplay extends AppCompatActivity {
     Intent intent;
     MediaPlayer likeSoundMP;
     Random mRand = new Random();
-
+    boolean doubleClick = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +85,28 @@ public class PostDisplay extends AppCompatActivity {
         postImageImageView = findViewById(R.id.PostImageImageView1);
         likeButton = findViewById(R.id.like_button);
 
+        postImageImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Handler handler = new Handler();
+                Runnable r = new Runnable() {
+                    @Override
+                    public void run() {
+                        doubleClick = false;
+                    }
+                };
+                if (doubleClick) {
+                    //your logic for double click action
+                    likeButton.callOnClick();
+                    likeButton.toggle();
+                    doubleClick = false;
+                } else {
+                    doubleClick = true;
+                    handler.postDelayed(r, 200);
+                }
+            }
+        });
+
         int[] Sounds = {R.raw.like1, R.raw.like2, R.raw.like3, R.raw.like4, R.raw.like5, R.raw.like6, R.raw.like7};
         int x = mRand.nextInt(7);
         likeSoundMP = MediaPlayer.create(this, Sounds[x]);
@@ -91,7 +115,7 @@ public class PostDisplay extends AppCompatActivity {
             public void onClick(View view) {
                 likeSoundMP.start();
                 int x = mRand.nextInt(7);
-                likeSoundMP = MediaPlayer.create(PostDisplay.this,Sounds[x]);
+                likeSoundMP = MediaPlayer.create(PostDisplay.this, Sounds[x]);
             }
         });
 
