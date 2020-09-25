@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.util.TimeUtils;
@@ -21,10 +22,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -52,6 +55,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import bolts.Bolts;
@@ -65,6 +69,10 @@ public class HomeActivity extends AppCompatActivity {
     private static final String POST_TYPE = "POST_TYPE";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final String TAG = "TAG";
+    Random mRand = new Random();
+    boolean doubleClick = false;
+    MediaPlayer likeSoundMP;
+
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mRef;
@@ -77,7 +85,7 @@ public class HomeActivity extends AppCompatActivity {
     ListView postsListView;
     TextView NoPostsTextView;
     LinearLayout uploadPhotoLayout;
-
+    ToggleButton likeButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +96,7 @@ public class HomeActivity extends AppCompatActivity {
         NoPostsTextView = findViewById(R.id.NoPostsLabel);
         NoPostsTextView.setVisibility(View.GONE);
 
+
         uploadPhotoLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,6 +105,8 @@ public class HomeActivity extends AppCompatActivity {
                 startActivityForResult(galleyIntent, RESULT_LOAD_IMAGE);
             }
         });
+
+
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mRef = mFirebaseDatabase.getReference();
@@ -143,7 +154,6 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-
     public void getAllFriendsPostFromLast20Days(Member member) {
         try {
             ArrayList<FriendsPost> allPostFromLast20Days = new ArrayList<>();
@@ -168,7 +178,7 @@ public class HomeActivity extends AppCompatActivity {
                             int size = 0;
                             ArrayList<Posts> friend_post_list = new ArrayList<>();
                             friend_post_list = (ArrayList<Posts>) friend.getPostList();
-                            if(friend_post_list!= null){
+                            if (friend_post_list != null) {
                                 friend_post_list.removeAll(Collections.singleton(null));
                             }
                             try {
@@ -208,10 +218,11 @@ public class HomeActivity extends AppCompatActivity {
                             }
                             Collections.reverse(allPostFromLast20Days);
                             Collections.reverse(ownersProfilePhoto);
-                            MyAdapter adapter = new MyAdapter(HomeActivity.this,allPostFromLast20Days, friend_to_post_list, ownersProfilePhoto);
+                            MyAdapter adapter = new MyAdapter(HomeActivity.this, allPostFromLast20Days, friend_to_post_list, ownersProfilePhoto);
                             postsListView.setAdapter(adapter);
                         }
                     }
+
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         // Failed to read value
@@ -224,8 +235,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -234,7 +243,7 @@ public class HomeActivity extends AppCompatActivity {
             selectedImage = data.getData();
             //444444
             StorageReference postRef = mStorageRef.child("postRef" + selectedImage.getLastPathSegment());
-            StorageReference takePost = mStorageRef.child("resizes").child("postRef" + selectedImage.getLastPathSegment()+"_1000x1000");
+            StorageReference takePost = mStorageRef.child("resizes").child("postRef" + selectedImage.getLastPathSegment() + "_1000x1000");
             postRef.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -267,8 +276,8 @@ public class HomeActivity extends AppCompatActivity {
         String rFriend_to_post_list[];
         ArrayList<String> rOwnersProfilePhoto;
 
-        MyAdapter(Context c, ArrayList<FriendsPost> allPostFromLast20Days,String friend_to_post_list[], ArrayList<String> ownersProfilePhoto) {
-            super(c, R.layout.post_display, R.id.PostOwnerNameTextView1,friend_to_post_list);
+        MyAdapter(Context c, ArrayList<FriendsPost> allPostFromLast20Days, String friend_to_post_list[], ArrayList<String> ownersProfilePhoto) {
+            super(c, R.layout.post_display, R.id.PostOwnerNameTextView1, friend_to_post_list);
             this.context = c;
             this.rAllPostFromLast20Days = allPostFromLast20Days;
             this.rFriend_to_post_list = friend_to_post_list;
@@ -287,8 +296,44 @@ public class HomeActivity extends AppCompatActivity {
             TextView postCategoryTextView = post_display.findViewById(R.id.PostCategoryTextView1);
             TextView postRequestTextView = post_display.findViewById(R.id.PostRequestTextView1);
             TextView postDescriptionTextView = post_display.findViewById(R.id.PostDescriptionTextView1);
+            ToggleButton likeButton = post_display.findViewById(R.id.like_button);
 
-            FriendsPost currentPost =rAllPostFromLast20Days.get(position);
+            postImageImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Handler handler = new Handler();
+                    Runnable r = new Runnable() {
+                        @Override
+                        public void run() {
+                            doubleClick = false;
+                        }
+                    };
+                    if (doubleClick) {
+                        //your logic for double click action
+                        likeButton.callOnClick();
+                        likeButton.toggle();
+                        doubleClick = false;
+                    } else {
+                        doubleClick = true;
+                        handler.postDelayed(r, 200);
+                    }
+                }
+            });
+
+            int[] Sounds = {R.raw.like1, R.raw.like2, R.raw.like3, R.raw.like4, R.raw.like5, R.raw.like6, R.raw.like7};
+            int x = mRand.nextInt(7);
+            likeSoundMP = MediaPlayer.create(HomeActivity.this, Sounds[x]);
+            likeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    likeSoundMP.start();
+                    int x = mRand.nextInt(7);
+                    likeSoundMP = MediaPlayer.create(HomeActivity.this, Sounds[x]);
+                }
+            });
+
+
+            FriendsPost currentPost = rAllPostFromLast20Days.get(position);
             String rTitle = currentPost.getMtitle();
             Boolean rIsVideo = currentPost.getIsvideo();
             Posts ThisPost = currentPost.getPost();
@@ -323,12 +368,11 @@ public class HomeActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
                     member = dataSnapshot.child("users").child(memberId).getValue(Member.class);
-                    if(member.getFriendList()!=null){
+                    if (member.getFriendList() != null) {
                         NoPostsTextView.setText("No Posts");
                         NoPostsTextView.setVisibility(View.GONE);
                         getAllFriendsPostFromLast20Days(member);
-                    }
-                    else{
+                    } else {
                         NoPostsTextView.setVisibility(View.VISIBLE);
                         NoPostsTextView.setText("No Friends");
                     }

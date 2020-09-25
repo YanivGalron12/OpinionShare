@@ -41,7 +41,7 @@ public class PostDisplay extends AppCompatActivity {
     TextView postCategoryTextView;
     TextView postRequestTextView;
     TextView postDescriptionTextView;
-    ProportionalImageView postImageImageView;
+    public ProportionalImageView postImageImageView;
     ToggleButton likeButton;
 
 

@@ -78,6 +78,7 @@
             <ToggleButton
                 android:id="@+id/like_button"
                 android:layout_width="40dp"
+                android:focusable="false"
                 android:layout_height="40dp"
                 android:background="@drawable/button_favorite"
                 android:checked="false"

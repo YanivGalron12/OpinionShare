@@ -97,6 +97,9 @@ public class ExploreActivity extends AppCompatActivity {
                 Intent intent = new Intent(ExploreActivity.this,ProfileActivity.class);
                 intent.putExtra(USER_TO_DISPLAY,userIdlist.get(position));
                 startActivity(intent);
+
+                userNamelist = new ArrayList<>();
+                userIdlist  = new ArrayList<>();
             }
         });
         bottomNavigationView.setSelectedItemId(R.id.explore);
