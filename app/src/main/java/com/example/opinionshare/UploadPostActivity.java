@@ -44,7 +44,6 @@ public class UploadPostActivity extends AppCompatActivity {
     EditText postDescriptionEditText;
     CheckBox forSaleCheckBox;
     ProportionalImageView postImageImageView;
-    ProportionalVideoView postVideoVideoView;
     String selectedContant, postType;
     Button upload_button;
 
@@ -74,7 +73,6 @@ public class UploadPostActivity extends AppCompatActivity {
         postRequestEditText = findViewById(R.id.PostRequestEditText);
         postDescriptionEditText = findViewById(R.id.PostDescriptionEditText);
         postImageImageView = findViewById(R.id.PostImageImageView);
-        postVideoVideoView = findViewById(R.id.PostVideoVideoView);
         upload_button = findViewById(R.id.upload_button);
         forSaleCheckBox = findViewById(R.id.ForSaleCheckBox);
 
@@ -84,16 +82,6 @@ public class UploadPostActivity extends AppCompatActivity {
         forSaleListRef = mFirebaseDatabase.getReference().child("ForSaleList");
 
         memberId = user.getUid();
-        postVideoVideoView.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                if (postVideoVideoView.isPlaying()){
-                    postVideoVideoView.pause();
-                } else {
-                    postVideoVideoView.start();
-                }
-            }
-        });
         upload_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,11 +119,8 @@ public class UploadPostActivity extends AppCompatActivity {
 
 
         if (postType.equals("Video")) {
-            postVideoVideoView.setVisibility(View.VISIBLE);
             postImageImageView.setVisibility(View.GONE);
-            postVideoVideoView.setVideoURI(Uri.parse(selectedContant));
         } else {
-            postVideoVideoView.setVisibility(View.GONE);
             postImageImageView.setVisibility(View.VISIBLE);
             Picasso.get().load(selectedContant).into(postImageImageView);
         }

@@ -20,8 +20,7 @@
             android:text="Shop"
             android:textSize="50sp"
             android:textStyle="bold"
-            android:gravity="center"
-            android:layout_centerInParent="true"/>
+            android:gravity="center"/>
 
         <GridView
             android:id="@+id/forSale_grid_view"

@@ -5,9 +5,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -17,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -57,24 +60,27 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HomeActivity extends AppCompatActivity {
 
+    private static final long DOUBLE_CLICK_TIME_DELTA = 300;//milliseconds
+    private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
+    private static final String URI_SELECTED = "URI_SELECTED";
+    private static final String POST_TYPE = "POST_TYPE";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final String TAG = "TAG";
-    private static final String POST_TYPE = "POST_TYPE";
-    private static final String URI_SELECTED = "URI_SELECTED";
+    int SELECT_VIDEO_REQUEST = 100;
+    long lastClickTime = 0;
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mRef;
     private StorageReference mStorageRef;
-    int SELECT_VIDEO_REQUEST = 100;
+    private Uri selectedVideoPath;
+    private Uri selectedImage;
     String memberId;
     Member member;
-    private Uri selectedImage;
-    private Uri selectedVideoPath;
-    private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
-    ListView listView;
 
     // Set UI Variables
+    ListView listView;
     ListView postsListView;
+    TextView NoPostsTextView;
     LinearLayout uploadVideoLayout;
     LinearLayout uploadPhotoLayout;
 
@@ -86,7 +92,10 @@ public class HomeActivity extends AppCompatActivity {
         postsListView = findViewById(R.id.PostsListView);
         uploadPhotoLayout = findViewById(R.id.UploadPhotoLayout);
         uploadVideoLayout = findViewById(R.id.UploadVideoLayout);
+        NoPostsTextView = findViewById(R.id.NoPostsLabel);
+        NoPostsTextView.setVisibility(View.GONE);
         uploadVideoLayout.setVisibility(View.GONE);
+
         uploadVideoLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,7 +103,6 @@ public class HomeActivity extends AppCompatActivity {
                 selectVideoFromGallery();
             }
         });
-
         uploadPhotoLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,21 +111,25 @@ public class HomeActivity extends AppCompatActivity {
                 startActivityForResult(galleyIntent, RESULT_LOAD_IMAGE);
             }
         });
+        postsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @SuppressLint("ShowToast")
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                long clickTime = System.currentTimeMillis();
+                if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA){
+//                    onDoubleClick(view);
+                    Toast.makeText(HomeActivity.this,"Double Click detected",Toast.LENGTH_SHORT);
+                } else {
+//                    onSingleClick(view);
+                    Toast.makeText(HomeActivity.this,"Single Click detected",Toast.LENGTH_SHORT);
 
-//        ArrayList<FriendsPost> allPostFromLast20Days = getAllFriendsPostFromLast20Days(member);
-//        String mTitle[] =new String[allPostFromLast20Days.size()];
-//        Boolean mIsVideo[] =new Boolean[allPostFromLast20Days.size()];
-//        String friend_to_post_list[] = new String[allPostFromLast20Days.size()];
-//        int i = 0;
-//        for (FriendsPost friendsPost: allPostFromLast20Days){
-//            Toast.makeText(HomeActivity.this,"3",Toast.LENGTH_SHORT);
-//
-//            mTitle[i] = friendsPost.getMtitle();
-//            mIsVideo[i] = friendsPost.getIsvideo();
-//            friend_to_post_list[i] = friendsPost.getFriendID();
-//            i=i+1;
-//        }
+                }
+                lastClickTime = clickTime;
+                Toast.makeText(HomeActivity.this,"!",Toast.LENGTH_SHORT);
 
+
+            }
+        });
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mRef = mFirebaseDatabase.getReference();
@@ -228,8 +240,10 @@ public class HomeActivity extends AppCompatActivity {
 
                             if (allPostFromLast20Days.size() != 0) {
                                 Toast.makeText(HomeActivity.this, "there are " + allPostFromLast20Days.size() + " posts", Toast.LENGTH_LONG).show();
+                                NoPostsTextView.setVisibility(View.GONE);
                             } else {
                                 Toast.makeText(HomeActivity.this, "no posts recognized", Toast.LENGTH_LONG).show();
+                                NoPostsTextView.setVisibility(View.VISIBLE);
                             }
                             String friend_to_post_list[] = new String[allPostFromLast20Days.size()];
                             int i = 0;
@@ -336,7 +350,6 @@ public class HomeActivity extends AppCompatActivity {
             View post_display = layoutInflater.inflate(R.layout.post_display, parent, false);
             CircleImageView postOwnerPhotoImageView = post_display.findViewById(R.id.PostOwnerPhotoImageView1);
             ProportionalImageView postImageImageView = post_display.findViewById(R.id.PostImageImageView1);
-            ProportionalVideoView postVideoVideoView = post_display.findViewById(R.id.PostVideoVideoView1);
             TextView postOwnerNameTextView = post_display.findViewById(R.id.PostOwnerNameTextView1);
             TextView postCategoryTextView = post_display.findViewById(R.id.PostCategoryTextView1);
             TextView postRequestTextView = post_display.findViewById(R.id.PostRequestTextView1);
@@ -349,10 +362,8 @@ public class HomeActivity extends AppCompatActivity {
             // now set our resources
             postOwnerNameTextView.setText(rTitle);
             if (rIsVideo) {
-                postVideoVideoView.setVisibility(View.VISIBLE);
                 postImageImageView.setVisibility(View.GONE);
             } else {
-                postVideoVideoView.setVisibility(View.GONE);
                 postImageImageView.setVisibility(View.VISIBLE);
                 Picasso.get().load(ThisPost.getPostUri()).into(postImageImageView);
                 postCategoryTextView.setText(ThisPost.getCategory());

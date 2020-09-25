@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,6 +25,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -38,7 +40,7 @@ public class PostDisplay extends AppCompatActivity {
     TextView postRequestTextView;
     TextView postDescriptionTextView;
     ProportionalImageView postImageImageView;
-    ProportionalVideoView postVideoVideoView;
+    Button likeButton;
 
 
     String userToDisplay_ID;
@@ -54,6 +56,9 @@ public class PostDisplay extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference usersRef;
     Intent intent;
+    MediaPlayer likeSoundMP;
+    Random mRand = new Random();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,16 +81,17 @@ public class PostDisplay extends AppCompatActivity {
         postRequestTextView = findViewById(R.id.PostRequestTextView1);
         postDescriptionTextView = findViewById(R.id.PostDescriptionTextView1);
         postImageImageView = findViewById(R.id.PostImageImageView1);
-        postVideoVideoView = findViewById(R.id.PostVideoVideoView1);
+        likeButton = findViewById(R.id.like_button);
 
-        postVideoVideoView.setOnClickListener(new View.OnClickListener() {
+        int[] Sounds = {R.raw.like1, R.raw.like2, R.raw.like3, R.raw.like4, R.raw.like5, R.raw.like6, R.raw.like7};
+        int x = mRand.nextInt(7);
+        likeSoundMP = MediaPlayer.create(this, Sounds[x]);
+        likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if (postVideoVideoView.isPlaying()) {
-                    postVideoVideoView.pause();
-                } else {
-                    postVideoVideoView.start();
-                }
+            public void onClick(View view) {
+                likeSoundMP.start();
+                int x = mRand.nextInt(7);
+                likeSoundMP = MediaPlayer.create(PostDisplay.this,Sounds[x]);
             }
         });
 
@@ -111,15 +117,15 @@ public class PostDisplay extends AppCompatActivity {
                     member = dataSnapshot.child(memberId).getValue(Member.class);
                     userToDisplay = dataSnapshot.child(userToDisplay_ID).getValue(Member.class);
                     Posts postToShow = new Posts();
-                    if (postToShow_position != -11){
+                    if (postToShow_position != -11) {
                         postToShow = userToDisplay.getPostByPosition(postToShow_position);
-                    }
-                    else{
+                    } else {
                         String[] postDetails = intent.getStringArrayExtra("POST_DETAILS");
                         postToShow.setCategory(postDetails[0]);
                         postToShow.setCaption(postDetails[1]);
                         postToShow.setDescription(postDetails[2]);
-                        postToShow.setPostType(postDetails[3]);                        postToShow.setCategory(postDetails[0]);
+                        postToShow.setPostType(postDetails[3]);
+                        postToShow.setCategory(postDetails[0]);
                         postToShow.setPostUri(postDetails[4]);
                     }
 
@@ -135,11 +141,9 @@ public class PostDisplay extends AppCompatActivity {
 
                     if (postType.equals("Video")) {
                         postImageImageView.setVisibility(View.GONE);
-                        postVideoVideoView.setVisibility(View.VISIBLE);
 
                     } else {
                         postImageImageView.setVisibility(View.VISIBLE);
-                        postVideoVideoView.setVisibility(View.GONE);
                         Picasso.get().load(postToShow.getPostUri()).into(postImageImageView);
 
                     }

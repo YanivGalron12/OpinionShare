@@ -81,8 +81,8 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
     ArrayList<String> friendList = new ArrayList<>();
     ArrayList<String> posts_uri = new ArrayList<String>();
     int PositionOfPost;
-    boolean userprofile=false;// if this is the current user's profile or someone else's
-    boolean DeletePost=false;//if user decide to delete post or not
+    boolean userprofile = false;// if this is the current user's profile or someone else's
+    boolean DeletePost = false;//if user decide to delete post or not
 
 
     @Override
@@ -105,7 +105,7 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
         postGridView.setAdapter(new PostAdapter(this, posts_uri));
 
             postGridView.setOnItemLongClickListener((AdapterView.OnItemLongClickListener) (parent, view, position, id) -> {
-                if(userprofile==true) {
+                if(userprofile) {
                     //option of deleting post from user profile and database
                     PositionOfPost = position;
                     openDialog();

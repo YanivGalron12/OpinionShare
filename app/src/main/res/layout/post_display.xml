@@ -54,23 +54,29 @@
             android:text="Can you guys please help me?"
             android:textSize="14sp"
             android:textStyle="bold" />
-        <com.example.opinionshare.ProportionalImageView
-            android:id="@+id/PostImageImageView1"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            android:layout_below="@+id/PostInformationLayout"
-            android:adjustViewBounds="true"
-            android:paddingTop="16dp"
-            android:src="@drawable/ic_boy" />
+            android:layout_below="@+id/PostInformationLayout">
 
-        <com.example.opinionshare.ProportionalVideoView
-            android:id="@+id/PostVideoVideoView1"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:layout_below="@+id/PostInformationLayout"
-            android:adjustViewBounds="true"
-            android:paddingTop="16dp"
-            />
+            <com.example.opinionshare.ProportionalImageView
+                android:id="@+id/PostImageImageView1"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_boy" />
+
+            <ToggleButton
+                android:id="@+id/like_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/button_favorite"
+                android:checked="false"
+                android:text=""
+                android:textOff=""
+                android:textOn="" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/PostDescriptionTextView1"
@@ -80,6 +86,8 @@
             android:text="This is the description. here i wiil give you more details about my problem and hope you can solve it"
             android:textSize="14sp"
             android:textStyle="bold" />
+
+
 
 
     </LinearLayout>

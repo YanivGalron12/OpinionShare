@@ -17,14 +17,6 @@ public class PostAdapter extends BaseAdapter {
 // PROFILE POST ADAPTER
     private Context mContext;
     public  ArrayList<String> postArray = new ArrayList<String>();
-//            "https://images.unsplash.com/photo-1536366764833-579c4e583927?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
-//            "https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
-//            "https://data.whicdn.com/images/322027365/original.jpg?t=1541703413",
-//            "https://i.pinimg.com/originals/be/ac/96/beac96b8e13d2198fd4bb1d5ef56cdcf.jpg",
-//            "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQXpnH-00qStJwOZt4JB_XUYCv7XNcL0EKMhA&usqp=CAU",
-//            "https://fiverr-res.cloudinary.com/images/q_auto,f_auto/gigs/144210359/original/3c963d035643c70401b0a0460ce49ac47f3e7398/create-a-cute-anime-profile-picture-for-you.jpg"
-//
-//    };
 
     public PostAdapter(Context mContext, ArrayList<String> post_array){
         this.mContext = mContext;

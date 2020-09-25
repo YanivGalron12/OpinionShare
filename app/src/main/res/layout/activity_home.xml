@@ -63,6 +63,17 @@
         android:layout_below="@id/ImageOrVidLayout"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/NoPostsLabel"
+            android:layout_marginTop="200dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No Posts"
+            android:textSize="50sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:layout_gravity="center" />
+
         <ListView
             android:id="@+id/PostsListView"
             android:layout_width="match_parent"
