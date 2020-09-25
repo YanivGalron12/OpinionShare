@@ -60,28 +60,22 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private static final long DOUBLE_CLICK_TIME_DELTA = 300;//milliseconds
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     private static final String URI_SELECTED = "URI_SELECTED";
     private static final String POST_TYPE = "POST_TYPE";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final String TAG = "TAG";
-    int SELECT_VIDEO_REQUEST = 100;
-    long lastClickTime = 0;
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mRef;
     private StorageReference mStorageRef;
-    private Uri selectedVideoPath;
     private Uri selectedImage;
     String memberId;
     Member member;
 
     // Set UI Variables
-    ListView listView;
     ListView postsListView;
     TextView NoPostsTextView;
-    LinearLayout uploadVideoLayout;
     LinearLayout uploadPhotoLayout;
 
     @Override
@@ -91,43 +85,15 @@ public class HomeActivity extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference().child("MembersPosts");
         postsListView = findViewById(R.id.PostsListView);
         uploadPhotoLayout = findViewById(R.id.UploadPhotoLayout);
-        uploadVideoLayout = findViewById(R.id.UploadVideoLayout);
         NoPostsTextView = findViewById(R.id.NoPostsLabel);
         NoPostsTextView.setVisibility(View.GONE);
-        uploadVideoLayout.setVisibility(View.GONE);
 
-        uploadVideoLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Move to Upload Page and say to it that you want to upload Video
-                selectVideoFromGallery();
-            }
-        });
         uploadPhotoLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Move to Upload Page and say to it that you want to upload Photo
                 Intent galleyIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(galleyIntent, RESULT_LOAD_IMAGE);
-            }
-        });
-        postsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @SuppressLint("ShowToast")
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                long clickTime = System.currentTimeMillis();
-                if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA){
-//                    onDoubleClick(view);
-                    Toast.makeText(HomeActivity.this,"Double Click detected",Toast.LENGTH_SHORT);
-                } else {
-//                    onSingleClick(view);
-                    Toast.makeText(HomeActivity.this,"Single Click detected",Toast.LENGTH_SHORT);
-
-                }
-                lastClickTime = clickTime;
-                Toast.makeText(HomeActivity.this,"!",Toast.LENGTH_SHORT);
-
-
             }
         });
 
@@ -177,18 +143,6 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    public void selectVideoFromGallery() {
-        Intent intent;
-        if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
-            intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-        } else {
-            intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.INTERNAL_CONTENT_URI);
-        }
-        intent.setType("video/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        intent.putExtra("return-data", true);
-        startActivityForResult(intent, SELECT_VIDEO_REQUEST);
-    }
 
     public void getAllFriendsPostFromLast20Days(Member member) {
         try {
@@ -299,27 +253,6 @@ public class HomeActivity extends AppCompatActivity {
                             Toast.makeText(HomeActivity.this, "HappyPhotoUploaded", Toast.LENGTH_LONG).show();
                             intent.putExtra(POST_TYPE, "Image");
                             intent.putExtra(URI_SELECTED, selectedImage.toString());
-                            startActivity(intent);
-                        }
-                    });
-                }
-            });
-        }
-        if (requestCode == SELECT_VIDEO_REQUEST && resultCode == RESULT_OK && data != null) {
-            selectedVideoPath = data.getData();
-            Intent intent = new Intent(HomeActivity.this, UploadPostActivity.class);
-            //4444444
-            StorageReference postRef = mStorageRef.child("post" + selectedVideoPath.getLastPathSegment());
-            postRef.putFile(selectedVideoPath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    postRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            selectedVideoPath = uri;
-                            Toast.makeText(HomeActivity.this, "Happy", Toast.LENGTH_LONG).show();
-                            intent.putExtra(POST_TYPE, "Video");
-                            intent.putExtra(URI_SELECTED, selectedVideoPath.toString());
                             startActivity(intent);
                         }
                     });

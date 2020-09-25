@@ -157,6 +157,13 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.profile:
+                        Intent intent = new Intent();
+                        if (memberId != userToDisplay_ID)
+                            intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                            intent.putExtra(USER_TO_DISPLAY, memberId);
+                            startActivity(intent);
+                            finish();
+                            overridePendingTransition(0, 0);
                         return true;
                 }
                 return false;
