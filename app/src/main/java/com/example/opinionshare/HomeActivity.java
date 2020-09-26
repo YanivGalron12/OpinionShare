@@ -72,6 +72,7 @@ public class HomeActivity extends AppCompatActivity {
     Random mRand = new Random();
     boolean doubleClick = false;
     MediaPlayer likeSoundMP;
+    String friend_to_post_list[];
 
 
     private FirebaseDatabase mFirebaseDatabase;
@@ -209,7 +210,7 @@ public class HomeActivity extends AppCompatActivity {
                                 Toast.makeText(HomeActivity.this, "no posts recognized", Toast.LENGTH_LONG).show();
                                 NoPostsTextView.setVisibility(View.VISIBLE);
                             }
-                            String friend_to_post_list[] = new String[allPostFromLast20Days.size()];
+                            friend_to_post_list = new String[allPostFromLast20Days.size()];
                             int i = 0;
                             for (FriendsPost friendsPost : allPostFromLast20Days) {
                                 Toast.makeText(HomeActivity.this, "3", Toast.LENGTH_SHORT);
@@ -297,6 +298,22 @@ public class HomeActivity extends AppCompatActivity {
             TextView postRequestTextView = post_display.findViewById(R.id.PostRequestTextView1);
             TextView postDescriptionTextView = post_display.findViewById(R.id.PostDescriptionTextView1);
             ToggleButton likeButton = post_display.findViewById(R.id.like_button);
+
+            postOwnerNameTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                    String userToDisplay = friend_to_post_list[position];
+                    intent.putExtra(USER_TO_DISPLAY, userToDisplay);
+                    startActivity(intent);
+                }
+            });
+            postOwnerPhotoImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    postOwnerNameTextView.callOnClick();
+                }
+            });
 
             postImageImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
