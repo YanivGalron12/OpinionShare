@@ -28,6 +28,8 @@ public class InboxActivity extends AppCompatActivity {
     String memberId;
     Member member;
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
+    private static final String SHOW_FRIENDS_OF_USER = "SHOW_FRIENDS_OF_USER" ;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,7 @@ public class InboxActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Intent intent;
                 switch (item.getItemId()){
                     case R.id.home:
                         startActivity(new Intent(getApplicationContext(),HomeActivity.class));
@@ -56,12 +59,14 @@ public class InboxActivity extends AppCompatActivity {
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.explore:
-                        startActivity(new Intent(getApplicationContext(),ExploreActivity.class));
+                        intent = new Intent(InboxActivity.this, ExploreActivity.class);
+                        intent.putExtra(SHOW_FRIENDS_OF_USER, "Show friends of all users");
+                        startActivity(intent);
                         finish();
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile:
-                        Intent intent = new Intent(InboxActivity.this, ProfileActivity.class);
+                        intent = new Intent(InboxActivity.this, ProfileActivity.class);
                         memberId=user.getUid();
                         intent.putExtra(USER_TO_DISPLAY, memberId);
                         startActivity(intent);

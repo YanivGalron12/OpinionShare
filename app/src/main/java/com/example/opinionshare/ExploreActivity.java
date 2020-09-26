@@ -29,6 +29,7 @@ import java.util.List;
 
 public class ExploreActivity extends AppCompatActivity {
 
+    private static final String SHOW_FRIENDS_OF_USER = "SHOW_FRIENDS_OF_USER";
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     private static final String TAG = "TAG";
     private FirebaseDatabase mFirebaseDatabase;
@@ -42,6 +43,8 @@ public class ExploreActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     SearchView searchView;
     ListView listView;
+    Intent intent;
+    String showFriends_ofUser;
 
     ArrayList<String> userNamelist = new ArrayList<>();
     ArrayList<String> userIdlist = new ArrayList<>();
@@ -51,6 +54,10 @@ public class ExploreActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_explore);
+
+        intent = getIntent();
+        showFriends_ofUser = intent.getStringExtra("SHOW_FRIENDS_OF_USER");
+
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         usersRef = mFirebaseDatabase.getReference().child("users");
@@ -65,11 +72,8 @@ public class ExploreActivity extends AppCompatActivity {
         searchView = findViewById(R.id.searchView);
         listView = findViewById(R.id.listView);
 
-//        listView.setVisibility(View.INVISIBLE);
-
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userNamelist);
         listView.setAdapter(adapter);
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -78,34 +82,29 @@ public class ExploreActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
-                if (newText.equals("")) {
-                    listView.setVisibility(View.INVISIBLE);
-                } else {
-                    listView.setVisibility(View.VISIBLE);
-                }
-
-
+                adapter.getFilter().filter(newText.trim());
                 return false;
             }
+
         });
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // go to profile activity and pass to that activity witch user as been selected and is ID
                 // over there show the profile according to the selected user ID
-                Intent intent = new Intent(ExploreActivity.this,ProfileActivity.class);
-                intent.putExtra(USER_TO_DISPLAY,userIdlist.get(position));
+                Intent intent = new Intent(ExploreActivity.this, ProfileActivity.class);
+                intent.putExtra(USER_TO_DISPLAY, userIdlist.get(position));
                 startActivity(intent);
 
                 userNamelist = new ArrayList<>();
-                userIdlist  = new ArrayList<>();
+                userIdlist = new ArrayList<>();
             }
         });
         bottomNavigationView.setSelectedItemId(R.id.explore);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Intent intent;
                 switch (item.getItemId()) {
                     case R.id.home:
                         startActivity(new Intent(getApplicationContext(), HomeActivity.class));
@@ -113,8 +112,8 @@ public class ExploreActivity extends AppCompatActivity {
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.profile:
-                        Intent intent = new Intent(ExploreActivity.this, ProfileActivity.class);
-                        memberId= user.getUid();
+                        intent = new Intent(ExploreActivity.this, ProfileActivity.class);
+                        memberId = user.getUid();
                         intent.putExtra(USER_TO_DISPLAY, memberId);
                         startActivity(intent);
                         finish();
@@ -131,12 +130,17 @@ public class ExploreActivity extends AppCompatActivity {
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.explore:
+                        intent = new Intent(ExploreActivity.this, ExploreActivity.class);
+                        intent.putExtra(SHOW_FRIENDS_OF_USER, "Show friends of all users");
+                        startActivity(intent);
+                        finish();
                         return true;
                 }
                 return false;
             }
         });
     }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -149,7 +153,10 @@ public class ExploreActivity extends AppCompatActivity {
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
-                    member = dataSnapshot.child("users").child(memberId).getValue(Member.class);
+                    if(!showFriends_ofUser.equals("Show friends of all users")){
+                        userIdlist = (ArrayList<String>) dataSnapshot.child(showFriends_ofUser).getValue(Member.class).getFriendList();
+                    }
+                    member = dataSnapshot.child(memberId).getValue(Member.class);
                 } else {
                     // TODO: change else actions
                     Toast.makeText(ExploreActivity.this, "user data does not exist", Toast.LENGTH_LONG).show();
@@ -171,14 +178,22 @@ public class ExploreActivity extends AppCompatActivity {
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
-                    for (DataSnapshot d: dataSnapshot.getChildren()){
-                     userNamelist.add((String)d.getValue());
-                     userIdlist.add((String)d.getKey());
+                    for (DataSnapshot d : dataSnapshot.getChildren()) {
+                        if(showFriends_ofUser.equals("Show friends of all users")){
+                            userNamelist.add((String) d.getValue());
+                            userIdlist.add((String) d.getKey());
+                        }else{
+                            if(userIdlist.contains((String) d.getKey())){
+                                userNamelist.add((String) d.getValue());
+                            }
+                        }
+
                     }
                 } else {
                     // TODO: change else actions
                     Toast.makeText(ExploreActivity.this, "user list data does not exist", Toast.LENGTH_LONG).show();
                 }
+                listView.setAdapter(adapter);
             }
 
             @Override

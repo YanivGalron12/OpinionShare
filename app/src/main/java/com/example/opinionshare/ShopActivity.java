@@ -39,6 +39,8 @@ public class ShopActivity extends AppCompatActivity {
     private DatabaseReference forSaleListRef;
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     private static final String POST_LOCATION = "POST_LOCATION";
+    private static final String SHOW_FRIENDS_OF_USER = "SHOW_FRIENDS_OF_USER" ;
+
 
     String memberId;
     Member member;
@@ -88,6 +90,7 @@ public class ShopActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Intent intent;
                 switch (item.getItemId()) {
                     case R.id.home:
                         startActivity(new Intent(getApplicationContext(), HomeActivity.class));
@@ -95,12 +98,13 @@ public class ShopActivity extends AppCompatActivity {
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.explore:
-                        startActivity(new Intent(getApplicationContext(), ExploreActivity.class));
-                        finish();
+                        intent = new Intent(ShopActivity.this, ExploreActivity.class);
+                        intent.putExtra(SHOW_FRIENDS_OF_USER, "Show friends of all users");
+                        startActivity(intent); finish();
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.profile:
-                        Intent intent = new Intent(ShopActivity.this, ProfileActivity.class);
+                        intent = new Intent(ShopActivity.this, ProfileActivity.class);
                         memberId = user.getUid();
                         intent.putExtra(USER_TO_DISPLAY, memberId);
                         startActivity(intent);

@@ -42,18 +42,19 @@
             android:gravity="center_horizontal"
             android:textColor="#f3f3f3"
             android:textSize="20sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            tools:ignore="HardcodedText" />
         <TextView
+            android:id="@+id/numofFriendsTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="20"
             android:gravity="center_horizontal"
             android:textColor="#f3f3f3"
             android:textSize="18sp"
             android:textStyle="bold"/>
 
         <LinearLayout
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"

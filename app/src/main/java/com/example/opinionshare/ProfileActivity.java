@@ -53,17 +53,17 @@ import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ProfileActivity extends AppCompatActivity implements DeleteDialog.NoticeDialogListener{
+public class ProfileActivity extends AppCompatActivity implements DeleteDialog.NoticeDialogListener {
 
+    private static final String SHOW_FRIENDS_OF_USER = "SHOW_FRIENDS_OF_USER" ;
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     private static final String POST_LOCATION = "POST_LOCATION";
     private static final String TAG = "AddToDatabase";
     private FirebaseAuth mAuth;
 
 
-
     // UI Objects
-    TextView username_textview, text;
+    TextView username_textview, text, numberOfFriends_textView;
     Button signout_btn, info_btn, addfriend_btn;
     GridView postGridView;
     CircleImageView profileImage;
@@ -101,31 +101,46 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
         profileImage = findViewById(R.id.profileImage);
         username_textview = findViewById(R.id.username_textview);
         postGridView = findViewById(R.id.post_grid_view);
+        numberOfFriends_textView = findViewById(R.id.numofFriendsTextView);
 
         postGridView.setAdapter(new PostAdapter(this, posts_uri));
 
-            postGridView.setOnItemLongClickListener((AdapterView.OnItemLongClickListener) (parent, view, position, id) -> {
-                if(userprofile) {
-                    //option of deleting post from user profile and database
-                    PositionOfPost = position;
-                    openDialog();
-                }
-                return true;
-            });
+        postGridView.setOnItemLongClickListener((AdapterView.OnItemLongClickListener) (parent, view, position, id) -> {
+            if (userprofile) {
+                //option of deleting post from user profile and database
+                PositionOfPost = position;
+                openDialog();
+            }
+            return true;
+        });
 
         postGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // go to PostDisplay activity and pass to that activity which user is currently looked on and which post to show
 
-                    Intent intent = new Intent(ProfileActivity.this, PostDisplay.class);
-                    intent.putExtra(USER_TO_DISPLAY, userToDisplay_ID);
-                    intent.putExtra(POST_LOCATION, String.valueOf(position));
-                    startActivity(intent);
+                Intent intent = new Intent(ProfileActivity.this, PostDisplay.class);
+                intent.putExtra(USER_TO_DISPLAY, userToDisplay_ID);
+                intent.putExtra(POST_LOCATION, String.valueOf(position));
+                startActivity(intent);
 
             }
         });
 
+        numberOfFriends_textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(numberOfFriends_textView.getText() == "0"){
+                    Toast.makeText(ProfileActivity.this,"Add user to your friend",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String showFriends_ofUser = userToDisplay_ID;
+                Intent intent = new Intent(ProfileActivity.this, ExploreActivity.class);
+                intent.putExtra(SHOW_FRIENDS_OF_USER, userToDisplay_ID);
+                startActivity(intent);
+
+            }
+        });
 
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -135,6 +150,7 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Intent intent;
                 switch (item.getItemId()) {
                     case R.id.home:
                         startActivity(new Intent(getApplicationContext(), HomeActivity.class));
@@ -142,8 +158,9 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.explore:
-                        startActivity(new Intent(getApplicationContext(), ExploreActivity.class));
-                        finish();
+                        intent = new Intent(ProfileActivity.this, ExploreActivity.class);
+                        intent.putExtra(SHOW_FRIENDS_OF_USER, "Show friends of all users");
+                        startActivity(intent);finish();
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.inbox:
@@ -157,19 +174,18 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.profile:
-                        Intent intent = new Intent();
+                        intent = new Intent();
                         if (memberId != userToDisplay_ID)
                             intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                            intent.putExtra(USER_TO_DISPLAY, memberId);
-                            startActivity(intent);
-                            finish();
-                            overridePendingTransition(0, 0);
+                        intent.putExtra(USER_TO_DISPLAY, memberId);
+                        startActivity(intent);
+                        finish();
+                        overridePendingTransition(0, 0);
                         return true;
                 }
                 return false;
             }
         });
-
 
 
         user = auth.getCurrentUser();
@@ -187,7 +203,7 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
             addfriend_btn.setVisibility(View.VISIBLE);
 
         } else {
-            userprofile=true;
+            userprofile = true;
             signout_btn.setEnabled(true);
             signout_btn.setVisibility(View.VISIBLE);
             info_btn.setEnabled(true);
@@ -225,8 +241,7 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                         Toast.makeText(ProfileActivity.this, "new friend added", Toast.LENGTH_LONG).show();
                         addfriend_btn.setText("remove friend");
                     }
-                }
-                else {
+                } else {
                     friendList.add(userToDisplay_ID);
                     Toast.makeText(ProfileActivity.this, "new friend added,now list is not empty", Toast.LENGTH_LONG).show();
                     addfriend_btn.setText("remove friend");
@@ -241,11 +256,12 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
 
     public void openDialog() {
         DeleteDialog deletedialog = new DeleteDialog();
-        deletedialog.show(getSupportFragmentManager(),"delete dialog"); //showing dialog of deleting option
+        deletedialog.show(getSupportFragmentManager(), "delete dialog"); //showing dialog of deleting option
     }
+
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) { //if user decides to delete post
-        DeletePost=true;
+        DeletePost = true;
         onStart();//where all the post grid is created and where the user data can be updated
     }
 
@@ -268,7 +284,7 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                 if (dataSnapshot.exists()) {
                     if (userToDisplay_ID.equals(memberId)) {
                         member = dataSnapshot.child(memberId).getValue(Member.class);
-                        userToDisplay=member;
+                        userToDisplay = member;
                         username_textview.setText(member.getUsername());
                         if (!member.getProfilePhotoUri().equals("NoPhoto")) {
                             Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
@@ -291,29 +307,30 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                             }
                         }
                     }
+                    if (userToDisplay.getFriendList() != null) {
+                        numberOfFriends_textView.setText(String.valueOf(userToDisplay.getFriendList().size()));
+                    } else {
+                        numberOfFriends_textView.setText(String.valueOf(0));
+                    }
                     ArrayList<Posts> PostList = (ArrayList<Posts>) userToDisplay.getPostList();
 
-                    if(PostList!=null)
-                    {
+                    if (PostList != null) {
                         Toast.makeText(ProfileActivity.this, "does have posts", Toast.LENGTH_LONG).show();
-                        if(DeletePost==true) {
+                        if (DeletePost == true) {
                             PostList.remove(PositionOfPost);//removing post user deletes
                         }
-                        if(PostList!=null) {
+                        if (PostList != null) {
                             for (int i = 0; i < PostList.size(); i++) {
                                 posts_uri.add(PostList.get(i).getPostUri());
                             }
-
-
                             DeletePost = false;
                             userToDisplay.setPostList(PostList);
                             addUserToDatabase(userToDisplay);
                         }
 
                         postGridView.setAdapter(new PostAdapter(ProfileActivity.this, posts_uri));// new adapter that does not include deleted post
-                        posts_uri=new ArrayList<String>();
-                    }
-                    else
+                        posts_uri = new ArrayList<String>();
+                    } else
                         Toast.makeText(ProfileActivity.this, "has no posts", Toast.LENGTH_LONG).show();
 
                 } else {
