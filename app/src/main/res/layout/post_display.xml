@@ -8,16 +8,15 @@
         android:id="@+id/PostInformationLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingLeft="3dp">
+            android:orientation="horizontal">
 
             <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_marginStart="10dp"
                 android:id="@+id/PostOwnerPhotoImageView1"
                 android:layout_width="30dp"
                 android:layout_height="30dp" />
@@ -50,6 +49,7 @@
             android:id="@+id/PostRequestTextView1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:layout_weight="1"
             android:text="Can you guys please help me?"
             android:textSize="14sp"
@@ -59,10 +59,12 @@
             android:id="@+id/PostDescriptionTextView1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:layout_weight="1"
             android:text="This is the description. here i wiil give you more details about my problem and hope you can solve it"
             android:textSize="14sp"
             android:textStyle="bold" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="400dp"
@@ -78,18 +80,15 @@
             <ToggleButton
                 android:id="@+id/like_button"
                 android:layout_width="40dp"
-                android:focusable="false"
                 android:layout_height="40dp"
                 android:background="@drawable/button_favorite"
                 android:checked="false"
+                android:focusable="false"
                 android:text=""
                 android:textOff=""
                 android:textOn="" />
 
         </RelativeLayout>
-
-
-
 
 
     </LinearLayout>

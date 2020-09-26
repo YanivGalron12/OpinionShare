@@ -87,6 +87,7 @@ public class HomeActivity extends AppCompatActivity {
     TextView NoPostsTextView;
     LinearLayout uploadPhotoLayout;
     ToggleButton likeButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,7 +107,6 @@ public class HomeActivity extends AppCompatActivity {
                 startActivityForResult(galleyIntent, RESULT_LOAD_IMAGE);
             }
         });
-
 
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();

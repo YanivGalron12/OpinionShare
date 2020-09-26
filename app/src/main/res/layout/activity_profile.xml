@@ -34,52 +34,79 @@
             android:textColor="#f3f3f3"
             android:textSize="50sp"
             android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Friends"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"
+            android:textColor="#f3f3f3"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="20"
+            android:gravity="center_horizontal"
+            android:textColor="#f3f3f3"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
 
-        <Button
-            android:layout_marginTop="50dp"
-            android:id="@+id/signout_btn"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_marginTop="30dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sign Out"
-            android:textAllCaps="false"
-            tools:ignore="HardcodedText" />
-        <Button
-            android:id="@+id/addfriend_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add Friend"
-            android:textAllCaps="false"
-            tools:ignore="HardcodedText" />
+            android:gravity="center_horizontal"
+            android:background="@color/fui_transparent"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/info_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="info"
-            android:textAllCaps="false"
-            tools:ignore="HardcodedText" />
+            <Button
+                android:id="@+id/signout_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sign Out"
+                android:textAllCaps="false"
+                tools:ignore="HardcodedText" />
+
+            <Button
+                android:id="@+id/addfriend_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Friend"
+                android:textAllCaps="false"
+                tools:ignore="HardcodedText" />
+
+            <Button
+                android:id="@+id/info_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="info"
+                android:textAllCaps="false"
+                tools:ignore="HardcodedText" />
+
+        </LinearLayout>
 
 
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/userpost_layout"
         android:layout_width="match_parent"
-        android:layout_below="@+id/userinformation_layout"
         android:layout_height="500dp"
+        android:layout_below="@+id/userinformation_layout"
         android:layout_marginTop="20dp"
         android:orientation="vertical">
 
-    <GridView
-        android:id="@+id/post_grid_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:columnWidth="90dp"
-        android:horizontalSpacing="10dp"
-        android:verticalSpacing="10dp"
-        android:gravity="center"
-        android:stretchMode="columnWidth"
-        android:numColumns="3"
-        />
+        <GridView
+            android:id="@+id/post_grid_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnWidth="90dp"
+            android:gravity="center"
+            android:horizontalSpacing="10dp"
+            android:numColumns="3"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="10dp" />
     </LinearLayout>
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -92,7 +119,6 @@
         android:elevation="4dp"
         app:civ_border_color="#FF000000"
         app:civ_border_width="2dp" />
-
 
 
 </RelativeLayout>
