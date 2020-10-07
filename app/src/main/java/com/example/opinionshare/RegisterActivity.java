@@ -132,10 +132,11 @@ public class RegisterActivity extends AppCompatActivity {
                 member.setEmail(edit_text_email.getText().toString());
                 member.setName(edit_text_fullname.getText().toString());
                 newUserName = edit_text_username.getText().toString();
+                newUserName = newUserName.trim();
                 if (!newUserName.equals("")) {
                     if (!newUserName.equals(memberUserName)&&!usersMap.containsValue(newUserName)) {
-                        usersMap.remove(memberId,memberUserName);
-                        usersMap.put(memberId,newUserName);
+                        usersMap.remove(memberId,memberUserName+"\n"+member.getProfilePhotoUri());
+                        usersMap.put(memberId,newUserName+"\n"+member.getProfilePhotoUri());
                         member.setUsername(newUserName);
                         memberUserName = member.getUsername();
                         Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
@@ -179,7 +180,8 @@ public class RegisterActivity extends AppCompatActivity {
         if (user.getPhotoUrl() != null) {
             memberProfilePhotoUri = user.getPhotoUrl().toString();
         } else {
-            memberProfilePhotoUri = "NoPhoto";
+            memberProfilePhotoUri = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcThwba7bWlXMP_8RyrorKR_NqUpHKlZMBcAJNxzdOMiOC7d5csj&usqp=CAU";
+
         }
         memberUserName = edit_text_username.getText().toString();
         member = new Member(memberId, memberName, memberEmail, memberProfilePhotoUri, memberPhoneNumber, memberUserName);

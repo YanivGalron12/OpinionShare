@@ -55,14 +55,12 @@ public class InboxActivity extends AppCompatActivity {
                 switch (item.getItemId()){
                     case R.id.home:
                         startActivity(new Intent(getApplicationContext(),HomeActivity.class));
-                        finish();
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.explore:
                         intent = new Intent(InboxActivity.this, ExploreActivity.class);
                         intent.putExtra(SHOW_FRIENDS_OF_USER, "Show friends of all users");
                         startActivity(intent);
-                        finish();
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile:
@@ -70,13 +68,10 @@ public class InboxActivity extends AppCompatActivity {
                         memberId=user.getUid();
                         intent.putExtra(USER_TO_DISPLAY, memberId);
                         startActivity(intent);
-                        finish();
-
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.shop:
                         startActivity(new Intent(getApplicationContext(), ShopActivity.class));
-                        finish();
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.inbox:

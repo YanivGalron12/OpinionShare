@@ -1,19 +1,29 @@
 package com.example.opinionshare;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,9 +33,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ExploreActivity extends AppCompatActivity {
 
@@ -46,9 +59,9 @@ public class ExploreActivity extends AppCompatActivity {
     Intent intent;
     String showFriends_ofUser;
 
-    ArrayList<String> userNamelist = new ArrayList<>();
-    ArrayList<String> userIdlist = new ArrayList<>();
-    ArrayAdapter<String> adapter;
+    private ArrayList<String> userNamelist = new ArrayList<>();
+    private ArrayList<String> userIdlist = new ArrayList<>();
+    private ArrayList<String> usersProfilePhoto = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +85,7 @@ public class ExploreActivity extends AppCompatActivity {
         searchView = findViewById(R.id.searchView);
         listView = findViewById(R.id.listView);
 
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userNamelist);
+        UsersListAdapter adapter = new UsersListAdapter(ExploreActivity.this, userIdlist, userNamelist, usersProfilePhoto);
         listView.setAdapter(adapter);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -97,6 +110,7 @@ public class ExploreActivity extends AppCompatActivity {
                 startActivity(intent);
 
                 userNamelist = new ArrayList<>();
+                usersProfilePhoto = new ArrayList<>();
                 userIdlist = new ArrayList<>();
             }
         });
@@ -108,7 +122,6 @@ public class ExploreActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.home:
                         startActivity(new Intent(getApplicationContext(), HomeActivity.class));
-                        finish();
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.profile:
@@ -116,29 +129,117 @@ public class ExploreActivity extends AppCompatActivity {
                         memberId = user.getUid();
                         intent.putExtra(USER_TO_DISPLAY, memberId);
                         startActivity(intent);
-                        finish();
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.inbox:
                         startActivity(new Intent(getApplicationContext(), InboxActivity.class));
-                        finish();
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.shop:
                         startActivity(new Intent(getApplicationContext(), ShopActivity.class));
-                        finish();
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.explore:
-                        intent = new Intent(ExploreActivity.this, ExploreActivity.class);
-                        intent.putExtra(SHOW_FRIENDS_OF_USER, "Show friends of all users");
-                        startActivity(intent);
-                        finish();
+                        if (!showFriends_ofUser.equals("Show friends of all users")) {
+                            intent = new Intent(ExploreActivity.this, ExploreActivity.class);
+                            intent.putExtra(SHOW_FRIENDS_OF_USER, "Show friends of all users");
+                            startActivity(intent);
+                        }
                         return true;
                 }
                 return false;
             }
         });
+    }
+
+    class UsersListAdapter extends ArrayAdapter<String> implements Filterable {
+        Context context;
+        ArrayList<String> rUsersProfileImageView;
+        ArrayList<String> rUserNameList;
+        ArrayList<String> rUserIdList;
+        ArrayList<String> mUsersProfileImageView;
+        ArrayList<String> mUserNameList;
+        ArrayList<String> mUserIdList;
+        CustomFilter cs;
+
+        UsersListAdapter(Context c, ArrayList<String> userIdlist, ArrayList<String> userNamelist, ArrayList<String> usersProfilePhoto) {
+            super(c, R.layout.user_list_display, R.id.UserNameTextView1, userNamelist);
+            this.context = c;
+            this.rUsersProfileImageView = usersProfilePhoto;
+            this.rUserIdList = userIdlist;
+            this.rUserNameList = userNamelist;
+            this.mUsersProfileImageView = usersProfilePhoto;
+            this.mUserIdList = userIdlist;
+            this.mUserNameList = userNamelist;
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            LayoutInflater layoutInflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View user_list_display = layoutInflater.inflate(R.layout.user_list_display, parent, false);
+            CircleImageView userProfileImageView = user_list_display.findViewById(R.id.UserProfileImageView1);
+            TextView userNameTextView = user_list_display.findViewById(R.id.UserNameTextView1);
+
+            String rName = rUserNameList.get(position);
+            userNameTextView.setText(rName);
+            Picasso.get().load(rUsersProfileImageView.get(position)).into(userProfileImageView);
+            return user_list_display;
+        }
+
+        @Override
+        public Filter getFilter() {
+            if (cs == null) {
+                cs = new CustomFilter();
+            }
+            return cs;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public int getCount() {
+            return rUserNameList.size();
+        }
+
+        class CustomFilter extends Filter {
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                rUserNameList.clear();
+                rUsersProfileImageView.clear();
+                rUserIdList.clear();
+                ArrayList<String> filters = (ArrayList<String>) filterResults.values;
+                for (int i = 0; i < filterResults.count; i++) {
+                    String[] s = filters.get(i).split("\\n");
+                    rUserNameList.add(s[0]);
+                    rUsersProfileImageView.add(s[1]);
+                    rUserIdList.add(s[2]);
+                }
+                notifyDataSetChanged();
+            }
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constrains) {
+                FilterResults results = new FilterResults();
+                ArrayList<String> filters = new ArrayList<>();
+                if (constrains != null && constrains.length() > 0) {
+                    constrains = constrains.toString().toUpperCase();
+                }else{
+                    constrains = "";
+                }
+                for (int i = 0; i < mUserNameList.size(); i++) {
+                    if (mUserNameList.get(i).toUpperCase().contains(constrains)) {
+                        filters.add(mUserNameList.get(i) + "\n" + mUsersProfileImageView.get(i) + "\n" + mUserIdList.get(i));
+                    }
+                }
+                results.count = filters.size();
+                results.values = filters;
+                return results;
+            }
+        }
     }
 
     @Override
@@ -153,7 +254,7 @@ public class ExploreActivity extends AppCompatActivity {
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
-                    if(!showFriends_ofUser.equals("Show friends of all users")){
+                    if (!showFriends_ofUser.equals("Show friends of all users")) {
                         userIdlist = (ArrayList<String>) dataSnapshot.child(showFriends_ofUser).getValue(Member.class).getFriendList();
                     }
                     member = dataSnapshot.child(memberId).getValue(Member.class);
@@ -179,20 +280,24 @@ public class ExploreActivity extends AppCompatActivity {
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
-                        if(showFriends_ofUser.equals("Show friends of all users")){
-                            userNamelist.add((String) d.getValue());
+                        if (showFriends_ofUser.equals("Show friends of all users")) {
+                            String s = (String) d.getValue();
+                            userNamelist.add(s.split("\\n")[0]);
+                            usersProfilePhoto.add(s.split("\\n")[1]);
                             userIdlist.add((String) d.getKey());
-                        }else{
-                            if(userIdlist.contains((String) d.getKey())){
-                                userNamelist.add((String) d.getValue());
+                        } else {
+                            if (userIdlist.contains((String) d.getKey())) {
+                                String s = (String) d.getValue();
+                                userNamelist.add(s.split("\\n")[0]);
+                                usersProfilePhoto.add(s.split("\\n")[1]);
                             }
                         }
-
                     }
                 } else {
                     // TODO: change else actions
                     Toast.makeText(ExploreActivity.this, "user list data does not exist", Toast.LENGTH_LONG).show();
                 }
+                UsersListAdapter adapter = new UsersListAdapter(ExploreActivity.this, userIdlist, userNamelist, usersProfilePhoto);
                 listView.setAdapter(adapter);
             }
 

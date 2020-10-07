@@ -112,6 +112,8 @@ public class UploadPostActivity extends AppCompatActivity {
                     forSaleList.add(postForSale);
                     forSaleListRef.setValue(forSaleList);
                 }
+
+                // Notification for all friends of logged in user
                 startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                 finish();
             }

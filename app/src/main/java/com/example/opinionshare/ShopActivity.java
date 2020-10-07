@@ -94,7 +94,6 @@ public class ShopActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.home:
                         startActivity(new Intent(getApplicationContext(), HomeActivity.class));
-                        finish();
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.explore:
@@ -108,12 +107,10 @@ public class ShopActivity extends AppCompatActivity {
                         memberId = user.getUid();
                         intent.putExtra(USER_TO_DISPLAY, memberId);
                         startActivity(intent);
-                        finish();
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.inbox:
                         startActivity(new Intent(getApplicationContext(), InboxActivity.class));
-                        finish();
                         overridePendingTransition(0, 0);
                     case R.id.shop:
                         return true;

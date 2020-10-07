@@ -154,7 +154,6 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                 switch (item.getItemId()) {
                     case R.id.home:
                         startActivity(new Intent(getApplicationContext(), HomeActivity.class));
-                        finish();
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.explore:
@@ -165,22 +164,20 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                         return true;
                     case R.id.inbox:
                         startActivity(new Intent(getApplicationContext(), InboxActivity.class));
-                        finish();
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.shop:
                         startActivity(new Intent(getApplicationContext(), ShopActivity.class));
-                        finish();
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.profile:
-                        intent = new Intent();
-                        if (memberId != userToDisplay_ID)
+                        if (!memberId.equals(userToDisplay_ID)){
                             intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                        intent.putExtra(USER_TO_DISPLAY, memberId);
-                        startActivity(intent);
-                        finish();
-                        overridePendingTransition(0, 0);
+                            intent.putExtra(USER_TO_DISPLAY, memberId);
+                            startActivity(intent);
+                            overridePendingTransition(0, 0);
+                        }
+
                         return true;
                 }
                 return false;
@@ -286,20 +283,12 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                         member = dataSnapshot.child(memberId).getValue(Member.class);
                         userToDisplay = member;
                         username_textview.setText(member.getUsername());
-                        if (!member.getProfilePhotoUri().equals("NoPhoto")) {
-                            Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
-                        } else {
-                            Picasso.get().load("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcThwba7bWlXMP_8RyrorKR_NqUpHKlZMBcAJNxzdOMiOC7d5csj&usqp=CAU").into(profileImage);
-                        }
+                        Picasso.get().load(member.getProfilePhotoUri()).into(profileImage);
                     } else {
                         userToDisplay = dataSnapshot.child(userToDisplay_ID).getValue(Member.class);
                         member = dataSnapshot.child(memberId).getValue(Member.class);
                         username_textview.setText(userToDisplay.getUsername());
-                        if (!userToDisplay.getProfilePhotoUri().equals("NoPhoto")) {
-                            Picasso.get().load(userToDisplay.getProfilePhotoUri()).into(profileImage);
-                        } else {
-                            Picasso.get().load("https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcThwba7bWlXMP_8RyrorKR_NqUpHKlZMBcAJNxzdOMiOC7d5csj&usqp=CAU").into(profileImage);
-                        }
+                        Picasso.get().load(userToDisplay.getProfilePhotoUri()).into(profileImage);
                         if (member.getFriendList() != null) {
                             friendList = (ArrayList<String>) member.getFriendList();
                             if (friendList.contains(userToDisplay_ID)) {
