@@ -22,8 +22,10 @@ import android.widget.Toast;
 import com.firebase.client.Firebase;
 import com.firebase.client.GenericTypeIndicator;
 import com.firebase.ui.auth.data.model.User;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.common.collect.Lists;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,6 +39,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.remote.Stream;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -68,8 +72,9 @@ public class RegisterActivity extends AppCompatActivity {
     private DocumentReference mDocRef;
 
     // member details
-    HashMap<String,String> usersMap = new HashMap<>();
+    HashMap<String, String> usersMap = new HashMap<>();
     boolean userexists = false;
+    ArrayList<String> devicesToken;
     String memberProfilePhotoUri;
     String memberPhoneNumber;
     String memberUserName;
@@ -134,9 +139,9 @@ public class RegisterActivity extends AppCompatActivity {
                 newUserName = edit_text_username.getText().toString();
                 newUserName = newUserName.trim();
                 if (!newUserName.equals("")) {
-                    if (!newUserName.equals(memberUserName)&&!usersMap.containsValue(newUserName)) {
-                        usersMap.remove(memberId,memberUserName+"\n"+member.getProfilePhotoUri());
-                        usersMap.put(memberId,newUserName+"\n"+member.getProfilePhotoUri());
+                    if (!newUserName.equals(memberUserName) && !usersMap.containsValue(newUserName)) {
+                        usersMap.remove(memberId, memberUserName + "\n" + member.getProfilePhotoUri());
+                        usersMap.put(memberId, newUserName + "\n" + member.getProfilePhotoUri());
                         member.setUsername(newUserName);
                         memberUserName = member.getUsername();
                         Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
@@ -146,8 +151,7 @@ public class RegisterActivity extends AppCompatActivity {
                         finish();
                         addUserToDatabase(member);
                         usersMapRef.setValue(usersMap);
-                    }
-                    else {
+                    } else {
                         if (newUserName.equals(memberUserName)) {
                             Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
                             intent.putExtra(USER_TO_DISPLAY, memberId);
@@ -184,7 +188,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         }
         memberUserName = edit_text_username.getText().toString();
-        member = new Member(memberId, memberName, memberEmail, memberProfilePhotoUri, memberPhoneNumber, memberUserName);
+        member = new Member(memberId, memberName, memberEmail, memberProfilePhotoUri, memberPhoneNumber, memberUserName, devicesToken);
         addUserToDatabase(member); // Add this member to RTDB (Real Time Database)
         // Display user details
         edit_text_email.setText(memberEmail);
@@ -200,7 +204,7 @@ public class RegisterActivity extends AppCompatActivity {
             profileImage.setImageURI(selectedImage);
             // TODO: photo needs to be downloaded and then stored in our database (Firestore ?) as file
             StorageReference Imagename = mStorageRef.child("image" + selectedImage.getLastPathSegment());
-            StorageReference takeImage = mStorageRef.child("resizes").child("image" + selectedImage.getLastPathSegment()+"_200x200");
+            StorageReference takeImage = mStorageRef.child("resizes").child("image" + selectedImage.getLastPathSegment() + "_200x200");
 
             Imagename.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -234,6 +238,7 @@ public class RegisterActivity extends AppCompatActivity {
                 // whenever data at this Location is updated
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
+                Boolean data_exist = false;
                 if (dataSnapshot.child(memberId).exists()) {
                     member = dataSnapshot.child(memberId).getValue(Member.class);
                     memberName = member.getName();
@@ -247,15 +252,41 @@ public class RegisterActivity extends AppCompatActivity {
                     edit_text_fullname.setText(memberName);
                     edit_text_username.setText(memberUserName);
                     Picasso.get().load(memberProfilePhotoUri).into(profileImage);
+                    data_exist = true;
 
                 } else {
                     if (!(metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp())) {
                         FirebaseUser user = auth.getCurrentUser();
                         createMemberForUser(user);
+                        data_exist = true;
+                    }else if(data_exist){
+                        devicesToken = (ArrayList<String>) member.getDevicesToken();
+                        FirebaseInstanceId.getInstance().getInstanceId()
+                                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                        if (!task.isSuccessful()) {
+                                            Log.w(TAG, "getInstanceId failed", task.getException());
+                                            return;
+                                        }
+                                        // Get new Instance ID token
+                                        String token = task.getResult().getToken();
+                                        if (devicesToken == null) {
+                                            devicesToken = new ArrayList<>();
+                                        }
+                                        if (!devicesToken.contains(token)) {
+                                            devicesToken.add(token);
+                                            member.setDevicesToken(devicesToken);
+                                            addUserToDatabase(member);
+                                        }
+                                    }
+                                });
+
                     }
                     // TODO: change else actions
                     Toast.makeText(RegisterActivity.this, "data does not exist", Toast.LENGTH_LONG).show();
                 }
+
             }
 
             @Override
@@ -275,13 +306,14 @@ public class RegisterActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
 
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
-                        usersMap.put((String)d.getKey(),(String)d.getValue());
+                        usersMap.put((String) d.getKey(), (String) d.getValue());
                     }
                 } else {
                     // TODO: change else actions
                     Toast.makeText(RegisterActivity.this, "users list data does not exist", Toast.LENGTH_LONG).show();
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Failed to read value

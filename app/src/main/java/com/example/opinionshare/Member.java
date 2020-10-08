@@ -12,6 +12,14 @@ public class Member {
     private String username;
     private String phoneNumber;
     private String profilePhotoUri;
+    private String postimageuri;
+
+    private Integer age, likeCounter;
+    private ArrayList<String> friendList;
+    private ArrayList<String> categoryList;
+    private ArrayList<String> devicesToken;
+    private ArrayList<Posts> PostList;
+
 
     public String getPostimageuri() {
         return postimageuri;
@@ -21,17 +29,12 @@ public class Member {
         this.postimageuri = postimageuri;
     }
 
-    private String postimageuri;
-    private Integer age, likeCounter;
-    private ArrayList<String> friendList;
-    private ArrayList<String> categoryList;
-    private ArrayList<Posts> PostList;
 
     public Member() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Member(String userId, String name, String email, String profilePhotoUri, String phoneNumber, String username) {
+    public Member(String userId, String name, String email, String profilePhotoUri, String phoneNumber, String username,ArrayList<String> devicesToken) {
         this.name = name;
         this.email = email;
         this.userId = userId;
@@ -41,10 +44,19 @@ public class Member {
         this.profilePhotoUri = profilePhotoUri;
         this.age = 1000;
         this.likeCounter = 0;
+        this.devicesToken = devicesToken;
         this.friendList = new ArrayList<String>();// TODO: add friendList to constructor
         this.categoryList = new ArrayList<String>();
         this.PostList = new ArrayList<Posts>();
 
+    }
+
+    public ArrayList<String> getDevicesToken() {
+        return devicesToken;
+    }
+
+    public void setDevicesToken(ArrayList<String> devicesToken) {
+        this.devicesToken = devicesToken;
     }
 
     public String getUsername() {
@@ -124,7 +136,7 @@ public class Member {
     }
 
     public void setFriendList(ArrayList<String> friendList) {
-        this.friendList =  friendList;
+        this.friendList = friendList;
     }
 
     public List<String> getCategoryList() {
@@ -139,7 +151,7 @@ public class Member {
         return PostList;
     }
 
-    public Posts getPostByPosition(int position){
+    public Posts getPostByPosition(int position) {
         return PostList.get(position);
     }
 

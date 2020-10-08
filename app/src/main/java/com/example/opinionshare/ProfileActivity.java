@@ -42,6 +42,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -55,7 +57,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileActivity extends AppCompatActivity implements DeleteDialog.NoticeDialogListener {
 
-    private static final String SHOW_FRIENDS_OF_USER = "SHOW_FRIENDS_OF_USER" ;
+    private static final String SHOW_FRIENDS_OF_USER = "SHOW_FRIENDS_OF_USER";
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     private static final String POST_LOCATION = "POST_LOCATION";
     private static final String TAG = "AddToDatabase";
@@ -80,6 +82,9 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
     Member member = new Member();
     ArrayList<String> friendList = new ArrayList<>();
     ArrayList<String> posts_uri = new ArrayList<String>();
+    ArrayList<String> devicesToken;
+    Boolean signning_out = false;
+
     int PositionOfPost;
     boolean userprofile = false;// if this is the current user's profile or someone else's
     boolean DeletePost = false;//if user decide to delete post or not
@@ -104,6 +109,7 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
         numberOfFriends_textView = findViewById(R.id.numofFriendsTextView);
 
         postGridView.setAdapter(new PostAdapter(this, posts_uri));
+
 
         postGridView.setOnItemLongClickListener((AdapterView.OnItemLongClickListener) (parent, view, position, id) -> {
             if (userprofile) {
@@ -130,13 +136,13 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
         numberOfFriends_textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(numberOfFriends_textView.getText() == "0"){
-                    Toast.makeText(ProfileActivity.this,"Add user to your friend",Toast.LENGTH_SHORT).show();
+                if (numberOfFriends_textView.getText() == "0") {
+                    Toast.makeText(ProfileActivity.this, "Add user to your friend", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 String showFriends_ofUser = userToDisplay_ID;
                 Intent intent = new Intent(ProfileActivity.this, ExploreActivity.class);
-                intent.putExtra(SHOW_FRIENDS_OF_USER, userToDisplay_ID);
+                intent.putExtra(SHOW_FRIENDS_OF_USER, showFriends_ofUser);
                 startActivity(intent);
 
             }
@@ -159,7 +165,8 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                     case R.id.explore:
                         intent = new Intent(ProfileActivity.this, ExploreActivity.class);
                         intent.putExtra(SHOW_FRIENDS_OF_USER, "Show friends of all users");
-                        startActivity(intent);finish();
+                        startActivity(intent);
+                        finish();
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.inbox:
@@ -171,7 +178,7 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.profile:
-                        if (!memberId.equals(userToDisplay_ID)){
+                        if (!memberId.equals(userToDisplay_ID)) {
                             intent = new Intent(getApplicationContext(), ProfileActivity.class);
                             intent.putExtra(USER_TO_DISPLAY, memberId);
                             startActivity(intent);
@@ -212,6 +219,22 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
         signout_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                signning_out = true;
+                FirebaseInstanceId.getInstance().getInstanceId()
+                        .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                if (!task.isSuccessful()) {
+                                    Log.w(TAG, "getInstanceId failed", task.getException());
+                                    return;
+                                }
+                                // Get new Instance ID token
+                                String token = task.getResult().getToken();
+                                devicesToken.remove(token);
+                                member.setDevicesToken(devicesToken);
+                                addUserToDatabase(member);
+                            }
+                        });
                 signOut();
             }
         });
@@ -276,6 +299,7 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this Location is updated
+
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
@@ -296,6 +320,27 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                             }
                         }
                     }
+                    devicesToken = (ArrayList<String>) member.getDevicesToken();
+                    FirebaseInstanceId.getInstance().getInstanceId()
+                            .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                    if (!task.isSuccessful()) {
+                                        Log.w(TAG, "getInstanceId failed", task.getException());
+                                        return;
+                                    }
+                                    // Get new Instance ID token
+                                    String token = task.getResult().getToken();
+                                    if (devicesToken == null) {
+                                        devicesToken = new ArrayList<>();
+                                    }
+                                    if (!devicesToken.contains(token) && !signning_out) {
+                                        devicesToken.add(token);
+                                        member.setDevicesToken(devicesToken);
+                                        addUserToDatabase(member);
+                                    }
+                                }
+                            });
                     if (userToDisplay.getFriendList() != null) {
                         numberOfFriends_textView.setText(String.valueOf(userToDisplay.getFriendList().size()));
                     } else {
@@ -305,7 +350,7 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
 
                     if (PostList != null) {
                         Toast.makeText(ProfileActivity.this, "does have posts", Toast.LENGTH_LONG).show();
-                        if (DeletePost == true) {
+                        if (DeletePost) {
                             PostList.remove(PositionOfPost);//removing post user deletes
                         }
                         if (PostList != null) {
