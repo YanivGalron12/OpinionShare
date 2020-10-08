@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.firebase.ui.auth.data.model.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -59,9 +60,10 @@ public class ExploreActivity extends AppCompatActivity {
     Intent intent;
     String showFriends_ofUser;
 
-    private ArrayList<String> userNamelist = new ArrayList<>();
-    private ArrayList<String> userIdlist = new ArrayList<>();
-    private ArrayList<String> usersProfilePhoto = new ArrayList<>();
+    private ArrayList<UserListRow> userRowsList = new ArrayList<>();
+    ArrayList<String> userIdlist = new ArrayList<>();
+
+    UsersListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,33 +87,17 @@ public class ExploreActivity extends AppCompatActivity {
         searchView = findViewById(R.id.searchView);
         listView = findViewById(R.id.listView);
 
-        UsersListAdapter adapter = new UsersListAdapter(ExploreActivity.this, userIdlist, userNamelist, usersProfilePhoto);
-        listView.setAdapter(adapter);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText.trim());
-                return false;
-            }
-
-        });
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // go to profile activity and pass to that activity witch user as been selected and is ID
                 // over there show the profile according to the selected user ID
                 Intent intent = new Intent(ExploreActivity.this, ProfileActivity.class);
-                intent.putExtra(USER_TO_DISPLAY, userIdlist.get(position));
+                intent.putExtra(USER_TO_DISPLAY, userRowsList.get(position).getUserID());
                 startActivity(intent);
 
-                userNamelist = new ArrayList<>();
-                usersProfilePhoto = new ArrayList<>();
-                userIdlist = new ArrayList<>();
+                userRowsList = new ArrayList<>();
             }
         });
         bottomNavigationView.setSelectedItemId(R.id.explore);
@@ -152,95 +138,6 @@ public class ExploreActivity extends AppCompatActivity {
         });
     }
 
-    class UsersListAdapter extends ArrayAdapter<String> implements Filterable {
-        Context context;
-        ArrayList<String> rUsersProfileImageView;
-        ArrayList<String> rUserNameList;
-        ArrayList<String> rUserIdList;
-        ArrayList<String> mUsersProfileImageView;
-        ArrayList<String> mUserNameList;
-        ArrayList<String> mUserIdList;
-        CustomFilter cs;
-
-        UsersListAdapter(Context c, ArrayList<String> userIdlist, ArrayList<String> userNamelist, ArrayList<String> usersProfilePhoto) {
-            super(c, R.layout.user_list_display, R.id.UserNameTextView1, userNamelist);
-            this.context = c;
-            this.rUsersProfileImageView = usersProfilePhoto;
-            this.rUserIdList = userIdlist;
-            this.rUserNameList = userNamelist;
-            this.mUsersProfileImageView = usersProfilePhoto;
-            this.mUserIdList = userIdlist;
-            this.mUserNameList = userNamelist;
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            LayoutInflater layoutInflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View user_list_display = layoutInflater.inflate(R.layout.user_list_display, parent, false);
-            CircleImageView userProfileImageView = user_list_display.findViewById(R.id.UserProfileImageView1);
-            TextView userNameTextView = user_list_display.findViewById(R.id.UserNameTextView1);
-
-            String rName = rUserNameList.get(position);
-            userNameTextView.setText(rName);
-            Picasso.get().load(rUsersProfileImageView.get(position)).into(userProfileImageView);
-            return user_list_display;
-        }
-
-        @Override
-        public Filter getFilter() {
-            if (cs == null) {
-                cs = new CustomFilter();
-            }
-            return cs;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public int getCount() {
-            return rUserNameList.size();
-        }
-
-        class CustomFilter extends Filter {
-            @Override
-            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                rUserNameList.clear();
-                rUsersProfileImageView.clear();
-                rUserIdList.clear();
-                ArrayList<String> filters = (ArrayList<String>) filterResults.values;
-                for (int i = 0; i < filterResults.count; i++) {
-                    String[] s = filters.get(i).split("\\n");
-                    rUserNameList.add(s[0]);
-                    rUsersProfileImageView.add(s[1]);
-                    rUserIdList.add(s[2]);
-                }
-                notifyDataSetChanged();
-            }
-
-            @Override
-            protected FilterResults performFiltering(CharSequence constrains) {
-                FilterResults results = new FilterResults();
-                ArrayList<String> filters = new ArrayList<>();
-                if (constrains != null && constrains.length() > 0) {
-                    constrains = constrains.toString().toUpperCase();
-                }else{
-                    constrains = "";
-                }
-                for (int i = 0; i < mUserNameList.size(); i++) {
-                    if (mUserNameList.get(i).toUpperCase().contains(constrains)) {
-                        filters.add(mUserNameList.get(i) + "\n" + mUsersProfileImageView.get(i) + "\n" + mUserIdList.get(i));
-                    }
-                }
-                results.count = filters.size();
-                results.values = filters;
-                return results;
-            }
-        }
-    }
 
     @Override
     protected void onStart() {
@@ -279,26 +176,39 @@ public class ExploreActivity extends AppCompatActivity {
                 Log.d(TAG, "onDataChange: Added information to database: \n" +
                         dataSnapshot.getValue());
                 if (dataSnapshot.exists()) {
+                    ArrayList<UserListRow> tempList = new ArrayList<>();
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
-                        if (showFriends_ofUser.equals("Show friends of all users")) {
-                            String s = (String) d.getValue();
-                            userNamelist.add(s.split("\\n")[0]);
-                            usersProfilePhoto.add(s.split("\\n")[1]);
-                            userIdlist.add((String) d.getKey());
-                        } else {
-                            if (userIdlist.contains((String) d.getKey())) {
-                                String s = (String) d.getValue();
-                                userNamelist.add(s.split("\\n")[0]);
-                                usersProfilePhoto.add(s.split("\\n")[1]);
+                        String s = (String) d.getValue();
+                        UserListRow newRow = new UserListRow(s.split("\\n")[0], (String) d.getKey(), s.split("\\n")[1]);
+                        tempList.add(newRow);
+                        if (!showFriends_ofUser.equals("Show friends of all users")) {
+                            for (int i = 0; i < tempList.size(); i++) {
+                                if (!userIdlist.contains(tempList.get(i).getUserID())) {
+                                    tempList.remove(i);
+                                }
                             }
                         }
+                        userRowsList = tempList;
                     }
                 } else {
                     // TODO: change else actions
                     Toast.makeText(ExploreActivity.this, "user list data does not exist", Toast.LENGTH_LONG).show();
                 }
-                UsersListAdapter adapter = new UsersListAdapter(ExploreActivity.this, userIdlist, userNamelist, usersProfilePhoto);
+                adapter = new UsersListAdapter(ExploreActivity.this, userRowsList);
                 listView.setAdapter(adapter);
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        adapter.getFilter().filter(newText.trim());
+                        return false;
+                    }
+
+                });
             }
 
             @Override
