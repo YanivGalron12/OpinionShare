@@ -1,8 +1,6 @@
 package com.example.opinionshare;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 public class Posts {
 
@@ -14,13 +12,14 @@ public class Posts {
     private String postType;
     private String caption;
     private String description;
+    private ArrayList <Item> items;
     private boolean forSale;
 
     public Posts() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Posts(String description, String postUri, String postType, String caption,  Integer likeCounter, String creationDate, String category, boolean forSale,String timeStamp) {
+    public Posts(String description, String postUri, String postType, String caption, Integer likeCounter, String creationDate, String category, boolean forSale, String timeStamp, ArrayList<Item> items) {
         this.description = description;
         this.likeCounter = likeCounter;
         this.creationDate = creationDate;
@@ -29,6 +28,7 @@ public class Posts {
         this.postUri = postUri;
         this.postType = postType;
         this.forSale = forSale;
+        this.items = items;
     }
 
     public String getTimeStamp() {
@@ -101,6 +101,14 @@ public class Posts {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public ArrayList<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(ArrayList<Item> items) {
+        this.items = items;
     }
 
 }

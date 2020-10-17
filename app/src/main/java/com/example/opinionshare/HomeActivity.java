@@ -70,6 +70,7 @@ public class HomeActivity extends AppCompatActivity {
     private static final String POST_TYPE = "POST_TYPE";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final String TAG = "TAG";
+    private static final String ORIGIN = "ORIGIN";
     Random mRand = new Random();
     boolean doubleClick = false;
     MediaPlayer likeSoundMP;
@@ -175,10 +176,8 @@ public class HomeActivity extends AppCompatActivity {
                         Log.d(TAG, "onDataChange: Added information to database: \n" +
                                 dataSnapshot.getValue());
                         Toast.makeText(HomeActivity.this, "1", Toast.LENGTH_LONG);
-
                         if (dataSnapshot.exists()) {
                             Toast.makeText(HomeActivity.this, "2", Toast.LENGTH_LONG);
-
                             Member friend = dataSnapshot.getValue(Member.class);
                             int size = 0;
                             ArrayList<Posts> friend_post_list = new ArrayList<>();
@@ -267,6 +266,7 @@ public class HomeActivity extends AppCompatActivity {
                             Toast.makeText(HomeActivity.this, "HappyPhotoUploaded", Toast.LENGTH_LONG).show();
                             intent.putExtra(POST_TYPE, "Image");
                             intent.putExtra(URI_SELECTED, selectedImage.toString());
+                            intent.putExtra(ORIGIN,"HomeActivity");
                             startActivity(intent);
                         }
                     });
