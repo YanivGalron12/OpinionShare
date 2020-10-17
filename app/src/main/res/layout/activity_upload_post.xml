@@ -83,6 +83,13 @@
                 android:layout_gravity="center"
                 android:textAlignment="center" />
 
+            <CheckBox android:id="@+id/checkbox_items"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Items For Sale"
+                android:onClick="onCheckboxClicked"/>
+
             <Button
                 android:id="@+id/upload_button"
                 android:layout_width="wrap_content"

@@ -3,6 +3,7 @@ package com.example.opinionshare;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,6 +38,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UploadPostActivity extends AppCompatActivity {
     private static final String TAG = "UPLOAD_POST_ACTIVITY_FOR_SALE_LIST:";
+    private static final String URI_SELECTED = "URI_SELECTED";
+    private static final String POST_TYPE = "POST_TYPE";
+    private static final String POST_CATEGORY = "POST_CATEGORY";
+    private static final String POST_CAPTION = "POST_CAPTION";
+    private static final String POST_DESCRIPTION = "POST_DESCRIPTION";
+    private static final String ORIGIN = "ORIGIN";
+
     CircleImageView postOwnerPhotoImageView;
     TextView postOwnerNameTextView;
     EditText postCategoryEditText;
@@ -46,10 +54,15 @@ public class UploadPostActivity extends AppCompatActivity {
     ProportionalImageView postImageImageView;
     String selectedContant, postType;
     Button upload_button;
-
+    CheckBox items_for_sale;
+    ArrayList<Item>items=new ArrayList<>();
     FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseUser user;
     String memberId;
+    String intentOrigin;
+    ArrayList<String> ItemsUri=new ArrayList<>();
+    ArrayList<String> ItemsCaption=new ArrayList<>();
+    ArrayList<String> ItemsDescription=new ArrayList<>();
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference usersRef;
@@ -58,14 +71,34 @@ public class UploadPostActivity extends AppCompatActivity {
     Posts post = new Posts();
     List<Posts> PostList = new ArrayList<Posts>();
     ArrayList<PostForSale> forSaleList = new ArrayList<PostForSale>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_post);
 
         Intent intent = getIntent();
-        postType = intent.getStringExtra("POST_TYPE");
-        selectedContant = intent.getStringExtra("URI_SELECTED");
+        intentOrigin=intent.getStringExtra(ORIGIN);
+        if(intentOrigin.equalsIgnoreCase("HomeActivity")) {
+            postType = intent.getStringExtra("POST_TYPE");
+            selectedContant=intent.getStringExtra(URI_SELECTED);
+        }
+//        else
+//        {
+//            ItemsUri= (ArrayList<String>) intent.getSerializableExtra("ITEMS_URI");
+//            ItemsDescription= (ArrayList<String>) intent.getSerializableExtra("ITEMS_DESCRIPTION");
+//            ItemsCaption= (ArrayList<String>) intent.getSerializableExtra("ITEMS_CAPTION");
+//            for(int i =0;i<ItemsUri.size();i++){
+//               Item item = new Item();
+//               item.setImage(ItemsUri.get(i));
+//               item.setType(ItemsDescription.get(i));
+//               item.setCompany(ItemsCaption.get(i));
+//               items.add(item);
+//            }
+//
+//
+//        }
+
 
         postOwnerPhotoImageView = findViewById(R.id.PostOwnerPhotoImageView);
         postOwnerNameTextView = findViewById(R.id.PostOwnerNameTextView);
@@ -75,6 +108,7 @@ public class UploadPostActivity extends AppCompatActivity {
         postImageImageView = findViewById(R.id.PostImageImageView);
         upload_button = findViewById(R.id.upload_button);
         forSaleCheckBox = findViewById(R.id.ForSaleCheckBox);
+        items_for_sale = findViewById(R.id.checkbox_items);
 
         user = auth.getCurrentUser();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -82,40 +116,106 @@ public class UploadPostActivity extends AppCompatActivity {
         forSaleListRef = mFirebaseDatabase.getReference().child("ForSaleList");
 
         memberId = user.getUid();
+        items_for_sale.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                upload_button.setText("Choose Items");
+            }
+        });
         upload_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(intentOrigin.equalsIgnoreCase("HomeActivity")) {
+                    postType = intent.getStringExtra("POST_TYPE");
+                    selectedContant=intent.getStringExtra(URI_SELECTED);
+                }
                 // TODO: Add post to data base and
-                Toast.makeText(UploadPostActivity.this, postType + " Upload", Toast.LENGTH_SHORT).show();
-
-                post.setCreationDate(java.time.LocalDate.now().toString());
-                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                post.setTimeStamp(Long.toString(timestamp.getTime()));
-                post.setPostType(postType);
-                post.setPostUri(Uri.parse(selectedContant).toString());//TODO: change link to be the link to the storage and not internal location
-                post.setLikeCounter(0);
-                post.setCaption(postCategoryEditText.getText().toString());
-                post.setDescription(postDescriptionEditText.getText().toString());
-                post.setCategory(postCategoryEditText.getText().toString());
-                post.setForSale(forSaleCheckBox.isChecked());
-                if (member.getPostList()!=null) {
-                    PostList  = member.getPostList();
+                   if(upload_button.getText() == "Choose Items") {
+//                    post.setCreationDate(java.time.LocalDate.now().toString());
+//                    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//                    post.setTimeStamp(Long.toString(timestamp.getTime()));
+//                    post.setPostType(postType);
+//                    post.setPostUri(Uri.parse(selectedContant).toString());//TODO: change link to be the link to the storage and not internal location
+//                    post.setLikeCounter(0);
+//                    post.setCaption(postCategoryEditText.getText().toString());
+//                    post.setDescription(postDescriptionEditText.getText().toString());
+//                    post.setCategory(postCategoryEditText.getText().toString());
+//                    post.setForSale(forSaleCheckBox.isChecked());
+                    Intent intent = new Intent(UploadPostActivity.this, ItemsList.class);
+//                    intent.putExtra(POST_TYPE, "Image");
+//                    intent.putExtra(URI_SELECTED, post.getPostUri());
+//                    intent.putExtra(POST_CAPTION, post.getCaption());
+//                    intent.putExtra(POST_CATEGORY, post.getCategory());
+//                    intent.putExtra(POST_DESCRIPTION, post.getDescription());
+                    startActivityForResult(intent,1);
+//                       Intent intent1 = getIntent();
+//                       intentOrigin=intent1.getStringExtra(ORIGIN);
+//                       ItemsUri= (ArrayList<String>) intent1.getSerializableExtra("ITEMS_URI");
+//                       ItemsDescription= (ArrayList<String>) intent1.getSerializableExtra("ITEMS_DESCRIPTION");
+//                       ItemsCaption= (ArrayList<String>) intent1.getSerializableExtra("ITEMS_CAPTION");
+//                       for(int i =0;i<ItemsUri.size();i++){
+//                           Item item = new Item();
+//                           item.setImage(ItemsUri.get(i));
+//                           item.setType(ItemsDescription.get(i));
+//                           item.setCompany(ItemsCaption.get(i));
+//                           items.add(item);
+//                       }
                 }
-                PostList.add(post);
-                PostForSale postForSale = new PostForSale();
-                postForSale.setOwnerId(memberId);
-                postForSale.setPost(post);
-                postForSale.setTimeStamp(post.getTimeStamp());
-                member.setPostList(PostList);
-                addPostToDatabase(member);
-                if(post.getForSale()){
-                    forSaleList.add(postForSale);
-                    forSaleListRef.setValue(forSaleList);
-                }
 
-                // Notification for all friends of logged in user
-                startActivity(new Intent(getApplicationContext(), HomeActivity.class));
-                finish();
+               if(upload_button.getText()=="Upload") {
+                   Toast.makeText(UploadPostActivity.this, postType + " Upload", Toast.LENGTH_SHORT).show();
+
+                   post.setCreationDate(java.time.LocalDate.now().toString());
+                   Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                   post.setTimeStamp(Long.toString(timestamp.getTime()));
+                   post.setPostType(postType);
+                   post.setPostUri(Uri.parse(selectedContant).toString());//TODO: change link to be the link to the storage and not internal location
+                   post.setLikeCounter(0);
+                   post.setCaption(postCategoryEditText.getText().toString());
+                   post.setDescription(postDescriptionEditText.getText().toString());
+                   post.setCategory(postCategoryEditText.getText().toString());
+                   post.setForSale(forSaleCheckBox.isChecked());
+                   post.setItems(items);
+
+                   if (member.getPostList() != null) {
+                       PostList = member.getPostList();
+                   }
+                   PostList.add(post);
+                   PostForSale postForSale = new PostForSale();
+                   postForSale.setOwnerId(memberId);
+                   postForSale.setPost(post);
+                   postForSale.setTimeStamp(post.getTimeStamp());
+                   member.setPostList(PostList);
+                   addPostToDatabase(member);
+                   if (post.getForSale()) {
+                       forSaleList.add(postForSale);
+                       forSaleListRef.setValue(forSaleList);
+                   }
+
+                   // Notification for all friends of logged in user
+                   startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+                   finish();
+               }
+
+//                else {
+////                    post.setCreationDate(java.time.LocalDate.now().toString());
+////                    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+////                    post.setTimeStamp(Long.toString(timestamp.getTime()));
+////                    post.setPostType(postType);
+////                    post.setPostUri(Uri.parse(selectedContant).toString());//TODO: change link to be the link to the storage and not internal location
+////                    post.setLikeCounter(0);
+////                    post.setCaption(postCategoryEditText.getText().toString());
+////                    post.setDescription(postDescriptionEditText.getText().toString());
+////                    post.setCategory(postCategoryEditText.getText().toString());
+////                    post.setForSale(forSaleCheckBox.isChecked());
+//                    Intent intent = new Intent(UploadPostActivity.this, ItemsList.class);
+////                    intent.putExtra(POST_TYPE, "Image");
+////                    intent.putExtra(URI_SELECTED, post.getPostUri());
+////                    intent.putExtra(POST_CAPTION, post.getCaption());
+////                    intent.putExtra(POST_CATEGORY, post.getCategory());
+////                    intent.putExtra(POST_DESCRIPTION, post.getDescription());
+//                    startActivityForResult(intent,0);
+//                }
             }
         });
 
@@ -127,6 +227,31 @@ public class UploadPostActivity extends AppCompatActivity {
             Picasso.get().load(selectedContant).into(postImageImageView);
         }
     }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                upload_button.setText("Upload");
+                intentOrigin=intent.getStringExtra(ORIGIN);
+                ItemsUri= (ArrayList<String>) intent.getSerializableExtra("ITEMS_URI");
+                ItemsDescription= (ArrayList<String>) intent.getSerializableExtra("ITEMS_DESCRIPTION");
+                ItemsCaption= (ArrayList<String>) intent.getSerializableExtra("ITEMS_CAPTION");
+                for(int i =0;i<ItemsUri.size();i++){
+                    Item item = new Item();
+                    item.setImage(ItemsUri.get(i));
+                    item.setType(ItemsDescription.get(i));
+                    item.setCompany(ItemsCaption.get(i));
+                    items.add(item);
+                }
+
+
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        }
+    }//onActivityResult
     @Override
     protected void onStart() {
         super.onStart();
