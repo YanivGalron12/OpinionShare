@@ -138,6 +138,8 @@ public class RegisterActivity extends AppCompatActivity {
                 member.setName(edit_text_fullname.getText().toString());
                 newUserName = edit_text_username.getText().toString();
                 newUserName = newUserName.trim();
+                usersMap.remove(memberId);
+                usersMap.put(memberId, memberUserName + "\n" + member.getProfilePhotoUri());
                 if (!newUserName.equals("")) {
                     if (!newUserName.equals(memberUserName) && !usersMap.containsValue(newUserName)) {
                         usersMap.remove(memberId, memberUserName + "\n" + member.getProfilePhotoUri());
@@ -147,18 +149,18 @@ public class RegisterActivity extends AppCompatActivity {
                         Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
                         intent.putExtra(USER_TO_DISPLAY, memberId);
-                        startActivity(intent);
-                        finish();
                         addUserToDatabase(member);
                         usersMapRef.setValue(usersMap);
+                        startActivity(intent);
+                        finish();
                     } else {
                         if (newUserName.equals(memberUserName)) {
                             Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
                             intent.putExtra(USER_TO_DISPLAY, memberId);
-                            startActivity(intent);
-                            finish();
                             addUserToDatabase(member);
                             usersMapRef.setValue(usersMap);
+                            startActivity(intent);
+                            finish();
                         } else {
                             Toast.makeText(RegisterActivity.this, "UserName is taken", Toast.LENGTH_SHORT).show();
                         }
