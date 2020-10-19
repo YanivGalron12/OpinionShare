@@ -41,7 +41,7 @@ public class DeleteDialog extends AppCompatDialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        boolean deletePost=false;
+        boolean deletePost = false;
         AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
         builder.setTitle("Deleting Post").setMessage("Are you sure you want to delete this post?")
                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
