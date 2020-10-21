@@ -13,13 +13,14 @@ public class Posts {
     private String caption;
     private String description;
     private ArrayList <Item> items;
+    private ArrayList<String> comments;
     private boolean forSale;
 
     public Posts() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Posts(String description, String postUri, String postType, String caption, Integer likeCounter, String creationDate, String category, boolean forSale, String timeStamp, ArrayList<Item> items) {
+    public Posts(String description, String postUri, String postType, String caption, Integer likeCounter, String creationDate, String category, boolean forSale, ArrayList<Item> items, ArrayList<String> comments ) {
         this.description = description;
         this.likeCounter = likeCounter;
         this.creationDate = creationDate;
@@ -29,6 +30,15 @@ public class Posts {
         this.postType = postType;
         this.forSale = forSale;
         this.items = items;
+        this.comments = comments;
+    }
+
+    public ArrayList<String> getComments() {
+        return comments;
+    }
+
+    public void setComments(ArrayList<String> comments) {
+        this.comments = comments;
     }
 
     public String getTimeStamp() {

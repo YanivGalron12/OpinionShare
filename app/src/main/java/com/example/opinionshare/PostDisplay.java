@@ -9,9 +9,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -43,6 +45,9 @@ public class PostDisplay extends AppCompatActivity {
     TextView postDescriptionTextView;
     public ProportionalImageView postImageImageView;
     ToggleButton likeButton;
+    ListView commentListView;
+    Button commentButton;
+    EditText comment_textView;
 
 
     String userToDisplay_ID;
@@ -50,6 +55,8 @@ public class PostDisplay extends AppCompatActivity {
     int postToShow_position;
     Member userToDisplay = new Member();
     Member member = new Member();
+    ArrayList<String> comments;
+    Posts postToShow = new Posts();
 
 
     // add Firebase Database stuff
@@ -76,7 +83,6 @@ public class PostDisplay extends AppCompatActivity {
             postToShow_position = -11;
         }
 
-
         postOwnerPhotoImageView = findViewById(R.id.PostOwnerPhotoImageView1);
         postOwnerNameTextView = findViewById(R.id.PostOwnerNameTextView1);
         postCategoryTextView = findViewById(R.id.PostCategoryTextView1);
@@ -84,6 +90,41 @@ public class PostDisplay extends AppCompatActivity {
         postDescriptionTextView = findViewById(R.id.PostDescriptionTextView1);
         postImageImageView = findViewById(R.id.PostImageImageView1);
         likeButton = findViewById(R.id.like_button);
+        commentButton = findViewById(R.id.comment_btn);
+        comment_textView = findViewById(R.id.comment_editText);
+        commentListView = findViewById(R.id.CommentsListView);
+        commentListView.setVisibility(View.GONE);
+        comment_textView.setVisibility(View.GONE);
+        commentButton.setVisibility(View.GONE);
+//        ArrayList<String> comments = postToShow.getComments();
+//        if (comments != null) {
+//            ArrayAdapter<String> adapter =
+//                    new ArrayAdapter<>(PostDisplay.this, android.R.layout.simple_list_item_1, comments);
+//            commentListView.setAdapter(adapter);
+//        }
+
+//        commentButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                if (comments != null) {
+//                    comments.add(comment_textView.getText().toString());
+//                    ArrayList<Posts> friendPostList = (ArrayList<Posts>) userToDisplay.getPostList();
+//                    friendPostList.remove(postToShow);
+//                    postToShow.setComments(comments);
+//                    friendPostList.add(postToShow);
+//                    userToDisplay.setPostList(friendPostList);
+//                    usersRef.child(userToDisplay.getUserId()).setValue(userToDisplay);
+//                } else {
+//                    Toast.makeText(PostDisplay.this, "Post's comments cant be shown here", Toast.LENGTH_LONG).show();
+//                }
+//                Toast.makeText(PostDisplay.this, userToDisplay.getName(), Toast.LENGTH_LONG).show();
+//
+//
+//            }
+//
+//
+//        });
 
         postImageImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,9 +181,9 @@ public class PostDisplay extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     member = dataSnapshot.child(memberId).getValue(Member.class);
                     userToDisplay = dataSnapshot.child(userToDisplay_ID).getValue(Member.class);
-                    Posts postToShow = new Posts();
                     if (postToShow_position != -11) {
                         postToShow = userToDisplay.getPostByPosition(postToShow_position);
+//                        comments = postToShow.getComments();
                     } else {
                         String[] postDetails = intent.getStringArrayExtra("POST_DETAILS");
                         postToShow.setCategory(postDetails[0]);

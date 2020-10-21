@@ -261,10 +261,8 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
                     friendList.add(userToDisplay_ID);
                     addfriend_btn.setText("remove friend");
                 }
-
                 member.setFriendList(friendList);
                 addUserToDatabase(member);
-
             }
         });
     }
