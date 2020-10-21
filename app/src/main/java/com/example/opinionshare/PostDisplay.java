@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -41,16 +42,17 @@ public class PostDisplay extends AppCompatActivity {
     TextView postCategoryTextView;
     TextView postRequestTextView;
     TextView postDescriptionTextView;
+   // ListView itemsInPost;
     public ProportionalImageView postImageImageView;
     ToggleButton likeButton;
-
+  //  ItemListAdapter adapter;
 
     String userToDisplay_ID;
     String memberId, postType;
     int postToShow_position;
     Member userToDisplay = new Member();
     Member member = new Member();
-
+    ArrayList<Item> items=new ArrayList<>();
 
     // add Firebase Database stuff
     FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -61,6 +63,9 @@ public class PostDisplay extends AppCompatActivity {
     MediaPlayer likeSoundMP;
     Random mRand = new Random();
     boolean doubleClick = false;
+ //   ArrayList<String> items_uri=new ArrayList<>();
+ // ArrayList<String> items_type=new ArrayList<>();
+ //   ArrayList<String>items_company=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,8 +88,10 @@ public class PostDisplay extends AppCompatActivity {
         postRequestTextView = findViewById(R.id.PostRequestTextView1);
         postDescriptionTextView = findViewById(R.id.PostDescriptionTextView1);
         postImageImageView = findViewById(R.id.PostImageImageView1);
+       // itemsInPost=findViewById(R.id.ItemsInPost);
         likeButton = findViewById(R.id.like_button);
-
+        //adapter = new ItemListAdapter(getApplicationContext(),R.layout.items_for_sale_listview,items);
+     //   itemsInPost.setAdapter(adapter);
         postImageImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,14 +150,24 @@ public class PostDisplay extends AppCompatActivity {
                     Posts postToShow = new Posts();
                     if (postToShow_position != -11) {
                         postToShow = userToDisplay.getPostByPosition(postToShow_position);
+                      //   items=postToShow.getItems();
+                     //    if(items!=null) {
+//                             for (int i = 0; i < items.size(); i++) {
+//                                 items_uri.add(items.get(i).getImage());
+//                                 items_company.add(items.get(i).getCompany());
+//                                 items_type.add(items.get(i).getType());
+//                             }
+//                         }
+//                        itemsInPost.setAdapter(adapter);
+
                     } else {
                         String[] postDetails = intent.getStringArrayExtra("POST_DETAILS");
                         postToShow.setCategory(postDetails[0]);
                         postToShow.setCaption(postDetails[1]);
                         postToShow.setDescription(postDetails[2]);
                         postToShow.setPostType(postDetails[3]);
-                        postToShow.setCategory(postDetails[0]);
                         postToShow.setPostUri(postDetails[4]);
+
                     }
 
 

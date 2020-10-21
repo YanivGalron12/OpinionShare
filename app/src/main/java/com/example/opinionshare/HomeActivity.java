@@ -88,7 +88,7 @@ public class HomeActivity extends AppCompatActivity {
     ListView postsListView;
     TextView NoPostsTextView;
     LinearLayout uploadPhotoLayout;
-    ToggleButton likeButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +125,8 @@ public class HomeActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                // this is the navigation bar at the bottom of the page so the user will be able to
+                //move from different activities.
                 Intent intent;
                 switch (item.getItemId()) {
                     case R.id.profile:
@@ -161,12 +163,14 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void getAllFriendsPostFromLast20Days(Member member) {
-        try {
+        //a function that sorts all the post of the user's friends from the last 20 days
+        //and displays them on the screen.
+        try {//we used the try&catch many times in this app to prevent null pointer error.
             ArrayList<FriendsPost> allPostFromLast20Days = new ArrayList<>();
             ArrayList<String> ownersProfilePhoto = new ArrayList<>();
 
             ArrayList<String> FriendsID = (ArrayList<String>) member.getFriendList();
-            for (String friendID : FriendsID) {
+            for (String friendID : FriendsID) {//going through each of the user's friends.
                 DatabaseReference postRef = mFirebaseDatabase.getReference().child("users").child(friendID);
                 postRef.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -175,15 +179,14 @@ public class HomeActivity extends AppCompatActivity {
                         // whenever data at this Location is updated
                         Log.d(TAG, "onDataChange: Added information to database: \n" +
                                 dataSnapshot.getValue());
-                        Toast.makeText(HomeActivity.this, "1", Toast.LENGTH_LONG);
                         if (dataSnapshot.exists()) {
-                            Toast.makeText(HomeActivity.this, "2", Toast.LENGTH_LONG);
                             Member friend = dataSnapshot.getValue(Member.class);
                             int size = 0;
                             ArrayList<Posts> friend_post_list = new ArrayList<>();
                             friend_post_list = (ArrayList<Posts>) friend.getPostList();
                             if (friend_post_list != null) {
                                 friend_post_list.removeAll(Collections.singleton(null));
+                                //making sure there are no deleted posts still located in the database
                             }
                             try {
                                 size = friend_post_list.size();
@@ -220,7 +223,7 @@ public class HomeActivity extends AppCompatActivity {
                                 friend_to_post_list[allPostFromLast20Days.size() - 1 - i] = friendsPost.getFriendID();
                                 i = i + 1;
                             }
-                            Collections.reverse(allPostFromLast20Days);
+                            Collections.reverse(allPostFromLast20Days);//to show it in LIFO.
                             Collections.reverse(ownersProfilePhoto);
                             MyAdapter adapter = new MyAdapter(HomeActivity.this, allPostFromLast20Days, friend_to_post_list, ownersProfilePhoto);
                             postsListView.setAdapter(adapter);
@@ -246,24 +249,25 @@ public class HomeActivity extends AppCompatActivity {
             Toast.makeText(HomeActivity.this, "Uploading", Toast.LENGTH_LONG).show();
             selectedImage = data.getData();
             //444444
-            StorageReference postRef = mStorageRef.child("postRef" + selectedImage.getLastPathSegment());
+            StorageReference postRef = mStorageRef.child("postRef" + selectedImage.getLastPathSegment());//where the post is located in the firebase.
             StorageReference takePost = mStorageRef.child("resizes").child("postRef" + selectedImage.getLastPathSegment() + "_1000x1000");
+            //here we resize the images so they will take less space and will be easier to upload and in the same size.
             postRef.putFile(selectedImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     try {
-                        Thread.sleep(10000);
-                        Toast.makeText(HomeActivity.this, "test", Toast.LENGTH_LONG).show();
+                        Thread.sleep(10000);//the time needed for the upload
+                        // we dont wnat to proceed before the image is resized and ready for storage
+
+
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     takePost.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            Toast.makeText(HomeActivity.this, "test2", Toast.LENGTH_LONG).show();
                             selectedImage = uri;
                             Intent intent = new Intent(HomeActivity.this, UploadPostActivity.class);
-                            Toast.makeText(HomeActivity.this, "HappyPhotoUploaded", Toast.LENGTH_LONG).show();
                             intent.putExtra(POST_TYPE, "Image");
                             intent.putExtra(URI_SELECTED, selectedImage.toString());
                             intent.putExtra(ORIGIN,"HomeActivity");
@@ -275,7 +279,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    class MyAdapter extends ArrayAdapter<String> {
+    class MyAdapter extends ArrayAdapter<String> {//this is the adapter for the listview of the posts.
         Context context;
         ArrayList<FriendsPost> rAllPostFromLast20Days;
         String rFriend_to_post_list[];
@@ -307,9 +311,11 @@ public class HomeActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                    //when clicking the username of the user who uploaded the post it goes to his profile.
                     String userToDisplay = friend_to_post_list[position];
                     intent.putExtra(USER_TO_DISPLAY, userToDisplay);
                     startActivity(intent);
+                    finish();
                 }
             });
             postOwnerPhotoImageView.setOnClickListener(new View.OnClickListener() {
@@ -342,6 +348,7 @@ public class HomeActivity extends AppCompatActivity {
             });
 
             int[] Sounds = {R.raw.like1, R.raw.like2, R.raw.like3, R.raw.like4, R.raw.like5, R.raw.like6, R.raw.like7};
+            //different sound for the like button
             int x = mRand.nextInt(7);
             likeSoundMP = MediaPlayer.create(HomeActivity.this, Sounds[x]);
             likeButton.setOnClickListener(new View.OnClickListener() {

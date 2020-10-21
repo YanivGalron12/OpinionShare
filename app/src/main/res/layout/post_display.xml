@@ -65,6 +65,7 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="400dp"
@@ -76,6 +77,8 @@
                 android:layout_height="400dp"
                 android:adjustViewBounds="true"
                 android:src="@drawable/ic_boy" />
+           =
+
 
             <ToggleButton
                 android:id="@+id/like_button"

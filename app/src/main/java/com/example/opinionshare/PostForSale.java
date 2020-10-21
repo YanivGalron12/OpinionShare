@@ -4,6 +4,9 @@ public class PostForSale {
     private Posts post;
     private String ownerId;
     private String timeStamp;
+    private String company;
+    private String type;
+    private double price;
 
     public Posts getPost() {
         return post;
@@ -26,6 +29,8 @@ public class PostForSale {
     }
 
     public void setTimeStamp(String timeStamp) {
-        this.timeStamp = timeStamp;
+        this.timeStamp=timeStamp;
     }
+
 }
+

@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         if (user != null) {
             // user is already signed in
             memberId = user.getUid();
-            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
             intent.putExtra(USER_TO_DISPLAY, memberId);
             startActivity(intent);
             finish();

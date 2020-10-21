@@ -147,18 +147,18 @@ public class RegisterActivity extends AppCompatActivity {
                         Toast.makeText(RegisterActivity.this, "Your details have been updated", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
                         intent.putExtra(USER_TO_DISPLAY, memberId);
-                        startActivity(intent);
-                        finish();
                         addUserToDatabase(member);
                         usersMapRef.setValue(usersMap);
+                        startActivity(intent);
+                        finish();
                     } else {
                         if (newUserName.equals(memberUserName)) {
                             Intent intent = new Intent(RegisterActivity.this, ProfileActivity.class);
                             intent.putExtra(USER_TO_DISPLAY, memberId);
-                            startActivity(intent);
-                            finish();
                             addUserToDatabase(member);
                             usersMapRef.setValue(usersMap);
+                            startActivity(intent);
+                            finish();
                         } else {
                             Toast.makeText(RegisterActivity.this, "UserName is taken", Toast.LENGTH_SHORT).show();
                         }
