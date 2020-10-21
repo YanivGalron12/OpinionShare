@@ -14,7 +14,7 @@ public class Member {
     private String profilePhotoUri;
     private String postimageuri;
 
-    private Integer age, likeCounter;
+    private Integer age;
     private ArrayList<String> friendList;
     private ArrayList<String> categoryList;
     private ArrayList<String> devicesToken;
@@ -43,7 +43,6 @@ public class Member {
         this.phoneNumber = phoneNumber;
         this.profilePhotoUri = profilePhotoUri;
         this.age = 1000;
-        this.likeCounter = 0;
         this.devicesToken = devicesToken;
         this.friendList = new ArrayList<String>();// TODO: add friendList to constructor
         this.categoryList = new ArrayList<String>();
@@ -121,14 +120,6 @@ public class Member {
 
     public void setAge(Integer age) {
         this.age = age;
-    }
-
-    public Integer getLikeCounter() {
-        return likeCounter;
-    }
-
-    public void setLikeCounter(Integer likeCounter) {
-        this.likeCounter = likeCounter;
     }
 
     public List<String> getFriendList() {

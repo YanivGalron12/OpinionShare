@@ -20,8 +20,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -29,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -64,7 +68,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private static final String SHOW_FRIENDS_OF_USER = "SHOW_FRIENDS_OF_USER" ;
+    private static final String SHOW_FRIENDS_OF_USER = "SHOW_FRIENDS_OF_USER";
     private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
     private static final String URI_SELECTED = "URI_SELECTED";
     private static final String POST_TYPE = "POST_TYPE";
@@ -83,6 +87,8 @@ public class HomeActivity extends AppCompatActivity {
     private Uri selectedImage;
     String memberId;
     Member member;
+    ArrayList<Member> friendsList = new ArrayList<>();
+    FriendsPost currentPost;
 
     // Set UI Variables
     ListView postsListView;
@@ -181,6 +187,7 @@ public class HomeActivity extends AppCompatActivity {
                                 dataSnapshot.getValue());
                         if (dataSnapshot.exists()) {
                             Member friend = dataSnapshot.getValue(Member.class);
+                            friendsList.add(friend);
                             int size = 0;
                             ArrayList<Posts> friend_post_list = new ArrayList<>();
                             friend_post_list = (ArrayList<Posts>) friend.getPostList();
@@ -263,6 +270,13 @@ public class HomeActivity extends AppCompatActivity {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    takePost.getDownloadUrl().addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(HomeActivity.this, "Failed!!!!! " + e.getMessage() + selectedImage.getLastPathSegment(), Toast.LENGTH_LONG).show();
+
+                        }
+                    });
                     takePost.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
@@ -270,7 +284,7 @@ public class HomeActivity extends AppCompatActivity {
                             Intent intent = new Intent(HomeActivity.this, UploadPostActivity.class);
                             intent.putExtra(POST_TYPE, "Image");
                             intent.putExtra(URI_SELECTED, selectedImage.toString());
-                            intent.putExtra(ORIGIN,"HomeActivity");
+                            intent.putExtra(ORIGIN, "HomeActivity");
                             startActivity(intent);
                         }
                     });
@@ -306,6 +320,10 @@ public class HomeActivity extends AppCompatActivity {
             TextView postRequestTextView = post_display.findViewById(R.id.PostRequestTextView1);
             TextView postDescriptionTextView = post_display.findViewById(R.id.PostDescriptionTextView1);
             ToggleButton likeButton = post_display.findViewById(R.id.like_button);
+            Button commentButton = post_display.findViewById(R.id.comment_btn);
+            ListView commentListView = post_display.findViewById(R.id.CommentsListView);
+            EditText comment_textView = post_display.findViewById(R.id.comment_editText);
+
 
             postOwnerNameTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -361,7 +379,39 @@ public class HomeActivity extends AppCompatActivity {
             });
 
 
-            FriendsPost currentPost = rAllPostFromLast20Days.get(position);
+            currentPost = rAllPostFromLast20Days.get(position);
+
+            commentListView.setVisibility(View.VISIBLE);
+            ArrayList<String> comments = currentPost.getPost().getComments();
+            if (comments != null) {
+                ArrayAdapter<String> adapter =
+                        new ArrayAdapter<>(HomeActivity.this, android.R.layout.simple_list_item_1, comments);
+                commentListView.setAdapter(adapter);
+            }
+            commentButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    currentPost = rAllPostFromLast20Days.get(position);
+                    ArrayList<String> comments = currentPost.getPost().getComments();
+                    if (comments == null) {
+                        comments = new ArrayList<>();
+                    }
+                    comments.add(comment_textView.getText().toString());
+                    for (Member friend : friendsList) {
+                        if (friend.getUserId().equals(currentPost.getFriendID())) {
+                            ArrayList<Posts> friendPostList = (ArrayList<Posts>) friend.getPostList();
+                            friendPostList.remove(currentPost.getPost());
+                            currentPost.getPost().setComments(comments);
+                            friendPostList.add(currentPost.getPost());
+                            friend.setPostList(friendPostList);
+                            addPostToDatabase(friend);
+                        }
+                    }
+
+                    Toast.makeText(HomeActivity.this, currentPost.getMtitle() + " " + currentPost.getPost().getCaption() + " " + position, Toast.LENGTH_LONG).show();
+                }
+            });
+
             String rTitle = currentPost.getMtitle();
             Boolean rIsVideo = currentPost.getIsvideo();
             Posts ThisPost = currentPost.getPost();
@@ -419,4 +469,8 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    private void addPostToDatabase(Member member) {
+        String memberId = member.getUserId();
+        mRef.child("users").child(memberId).setValue(member);
+    }
 }

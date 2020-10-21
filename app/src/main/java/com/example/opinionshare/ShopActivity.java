@@ -30,27 +30,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class ShopActivity extends AppCompatActivity {
+    public class ShopActivity extends AppCompatActivity {
 
-    private static final String TAG = "SHOP_ACTIVITY:";
-    private static final String POST_DETAILS = "POST_DETAILS";
-    private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mRef;
-    private DatabaseReference forSaleListRef;
-    private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
-    private static final String POST_LOCATION = "POST_LOCATION";
-    private static final String SHOW_FRIENDS_OF_USER = "SHOW_FRIENDS_OF_USER" ;
+        private static final String TAG = "SHOP_ACTIVITY:";
+        private static final String POST_DETAILS = "POST_DETAILS";
+        private FirebaseDatabase mFirebaseDatabase;
+        private DatabaseReference mRef;
+        private DatabaseReference forSaleListRef;
+        private static final String USER_TO_DISPLAY = "USER_TO_DISPLAY";
+        private static final String POST_LOCATION = "POST_LOCATION";
+        private static final String SHOW_FRIENDS_OF_USER = "SHOW_FRIENDS_OF_USER" ;
 
+        String memberId;
+        Member member;
 
-    String memberId;
-    Member member;
-
-    // UI Objects
-    GridView forSale_grid_view;
-
-    ArrayList<String> posts_uri = new ArrayList<>();
-    ArrayList<PostForSale> forSaleList = new ArrayList<>();
-
+        // UI Objects
+        GridView forSale_grid_view;
+        ArrayList<String> posts_uri = new ArrayList<>();
+        ArrayList<PostForSale> forSaleList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -139,7 +136,6 @@ public class ShopActivity extends AppCompatActivity {
                     Toast.makeText(ShopActivity.this, "data does not exist", Toast.LENGTH_LONG).show();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Failed to read value
@@ -160,11 +156,11 @@ public class ShopActivity extends AppCompatActivity {
                         boolean flag=false;
                         for(int i=0;i<forSaleList.size();i++) {
                             PostForSale currpost = forSaleList.get(i);
-                            if (currpost.getTimeStamp() == postForSale.getTimeStamp()
-                                    && currpost.getOwnerId() == postForSale.getOwnerId())
+                            if (currpost.getTimeStamp().equals(postForSale.getTimeStamp())
+                                    && currpost.getOwnerId().equals(postForSale.getOwnerId()))
                                 flag = true;//a check meant to prevent unwanted multiplicity
                         }
-                        if(flag==false) {
+                        if(!flag) {
                             forSaleList.add(postForSale);
                             posts_uri.add(postForSale.getPost().getPostUri());
                         }

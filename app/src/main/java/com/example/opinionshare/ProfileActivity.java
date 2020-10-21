@@ -81,7 +81,7 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
     Member userToDisplay = new Member();
     Member member = new Member();
     ArrayList<String> friendList = new ArrayList<>();
-    ArrayList<String> posts_uri = new ArrayList<String>();
+    ArrayList<String> posts_uri = new ArrayList<>();
     ArrayList<String> devicesToken;
     Boolean signning_out = false;
 
@@ -94,7 +94,6 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-
 
         Intent intent = getIntent();
         userToDisplay_ID = intent.getStringExtra("USER_TO_DISPLAY");
@@ -248,28 +247,22 @@ public class ProfileActivity extends AppCompatActivity implements DeleteDialog.N
         addfriend_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(ProfileActivity.this, "friend button pressed", Toast.LENGTH_LONG).show();
                 if (member.getFriendList() != null) {
                     friendList = (ArrayList<String>) member.getFriendList();
 
                     if (friendList.contains(userToDisplay_ID)) {
-                        Toast.makeText(ProfileActivity.this, "already friends ' now being removed", Toast.LENGTH_LONG).show();
                         friendList.remove(userToDisplay_ID);
                         addfriend_btn.setText("add friend");
                     } else {
                         friendList.add(userToDisplay_ID);
-                        Toast.makeText(ProfileActivity.this, "new friend added", Toast.LENGTH_LONG).show();
                         addfriend_btn.setText("remove friend");
                     }
                 } else {
                     friendList.add(userToDisplay_ID);
-                    Toast.makeText(ProfileActivity.this, "new friend added,now list is not empty", Toast.LENGTH_LONG).show();
                     addfriend_btn.setText("remove friend");
                 }
-
                 member.setFriendList(friendList);
                 addUserToDatabase(member);
-
             }
         });
     }

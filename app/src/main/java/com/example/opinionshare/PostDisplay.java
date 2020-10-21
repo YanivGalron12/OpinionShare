@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -45,14 +46,22 @@ public class PostDisplay extends AppCompatActivity {
    // ListView itemsInPost;
     public ProportionalImageView postImageImageView;
     ToggleButton likeButton;
-  //  ItemListAdapter adapter;
+
+    ListView commentListView;
+    Button commentButton;
+    EditText comment_textView;
+
+
 
     String userToDisplay_ID;
     String memberId, postType;
     int postToShow_position;
     Member userToDisplay = new Member();
     Member member = new Member();
-    ArrayList<Item> items=new ArrayList<>();
+    ArrayList<String> comments;
+    Posts postToShow = new Posts();
+
+
 
     // add Firebase Database stuff
     FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -63,9 +72,7 @@ public class PostDisplay extends AppCompatActivity {
     MediaPlayer likeSoundMP;
     Random mRand = new Random();
     boolean doubleClick = false;
- //   ArrayList<String> items_uri=new ArrayList<>();
- // ArrayList<String> items_type=new ArrayList<>();
- //   ArrayList<String>items_company=new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,17 +88,50 @@ public class PostDisplay extends AppCompatActivity {
             postToShow_position = -11;
         }
 
-
         postOwnerPhotoImageView = findViewById(R.id.PostOwnerPhotoImageView1);
         postOwnerNameTextView = findViewById(R.id.PostOwnerNameTextView1);
         postCategoryTextView = findViewById(R.id.PostCategoryTextView1);
         postRequestTextView = findViewById(R.id.PostRequestTextView1);
         postDescriptionTextView = findViewById(R.id.PostDescriptionTextView1);
         postImageImageView = findViewById(R.id.PostImageImageView1);
-       // itemsInPost=findViewById(R.id.ItemsInPost);
+      
         likeButton = findViewById(R.id.like_button);
-        //adapter = new ItemListAdapter(getApplicationContext(),R.layout.items_for_sale_listview,items);
-     //   itemsInPost.setAdapter(adapter);
+        commentButton = findViewById(R.id.comment_btn);
+        comment_textView = findViewById(R.id.comment_editText);
+        commentListView = findViewById(R.id.CommentsListView);
+        commentListView.setVisibility(View.GONE);
+        comment_textView.setVisibility(View.GONE);
+        commentButton.setVisibility(View.GONE);
+//        ArrayList<String> comments = postToShow.getComments();
+//        if (comments != null) {
+//            ArrayAdapter<String> adapter =
+//                    new ArrayAdapter<>(PostDisplay.this, android.R.layout.simple_list_item_1, comments);
+//            commentListView.setAdapter(adapter);
+//        }
+
+//        commentButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                if (comments != null) {
+//                    comments.add(comment_textView.getText().toString());
+//                    ArrayList<Posts> friendPostList = (ArrayList<Posts>) userToDisplay.getPostList();
+//                    friendPostList.remove(postToShow);
+//                    postToShow.setComments(comments);
+//                    friendPostList.add(postToShow);
+//                    userToDisplay.setPostList(friendPostList);
+//                    usersRef.child(userToDisplay.getUserId()).setValue(userToDisplay);
+//                } else {
+//                    Toast.makeText(PostDisplay.this, "Post's comments cant be shown here", Toast.LENGTH_LONG).show();
+//                }
+//                Toast.makeText(PostDisplay.this, userToDisplay.getName(), Toast.LENGTH_LONG).show();
+//
+//
+//            }
+//
+//
+//        });
+
         postImageImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,18 +187,8 @@ public class PostDisplay extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     member = dataSnapshot.child(memberId).getValue(Member.class);
                     userToDisplay = dataSnapshot.child(userToDisplay_ID).getValue(Member.class);
-                    Posts postToShow = new Posts();
                     if (postToShow_position != -11) {
                         postToShow = userToDisplay.getPostByPosition(postToShow_position);
-                      //   items=postToShow.getItems();
-                     //    if(items!=null) {
-//                             for (int i = 0; i < items.size(); i++) {
-//                                 items_uri.add(items.get(i).getImage());
-//                                 items_company.add(items.get(i).getCompany());
-//                                 items_type.add(items.get(i).getType());
-//                             }
-//                         }
-//                        itemsInPost.setAdapter(adapter);
 
                     } else {
                         String[] postDetails = intent.getStringArrayExtra("POST_DETAILS");

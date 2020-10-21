@@ -5,5 +5,7 @@
     <string name="fb_login_protocol_scheme">fb202893697669946</string>
     <string name="facebook_application_id" translatable="false">202893697669946</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb202893697669946</string>
+    <string name="add_comment">add comment...</string>
+    <string name="comment">Comment</string>
 
 </resources>

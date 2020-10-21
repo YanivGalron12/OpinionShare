@@ -138,6 +138,8 @@ public class RegisterActivity extends AppCompatActivity {
                 member.setName(edit_text_fullname.getText().toString());
                 newUserName = edit_text_username.getText().toString();
                 newUserName = newUserName.trim();
+                usersMap.remove(memberId);
+                usersMap.put(memberId, memberUserName + "\n" + member.getProfilePhotoUri());
                 if (!newUserName.equals("")) {
                     if (!newUserName.equals(memberUserName) && !usersMap.containsValue(newUserName)) {
                         usersMap.remove(memberId, memberUserName + "\n" + member.getProfilePhotoUri());
